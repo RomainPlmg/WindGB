@@ -3,5 +3,6 @@
 
 #include <array>
 #include <cstdint>
+#include <string>
 
 #endif  // __PCH_H__
