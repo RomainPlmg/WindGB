@@ -75,9 +75,6 @@ class Registers {
         H = 0b00100000,
         C = 0b00010000
     };
-
-    uint16_t GetAndIncrPC();
-    uint16_t IncrPC();
 };
 
 #endif  // __REGISTERS_H__

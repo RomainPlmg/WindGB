@@ -1,23 +1,55 @@
 #include "opcodes.h"
 
-// TODO: Implement function body
+#include "cpu.h"
+#include "ram.h"
+#include "registers.h"
+
+// TODO: Implement decode function
 void Op_Nop(CPU& cpu) { return; }  // Nop
 
-void Op_LD_BC_n16(CPU& cpu) {}  // LD BC, n16
+void Op_LD_BC_n16(CPU& cpu) {
+    uint16_t value = cpu.Fetch16();
+    cpu.GetRegisters()->BC = value;
+}  // LD BC, n16
 
-void Op_LD_DE_n16(CPU& cpu) {}  // LD DE, n16
+void Op_LD_DE_n16(CPU& cpu) {
+    uint16_t value = cpu.Fetch16();
+    cpu.GetRegisters()->DE = value;
+}  // LD DE, n16
 
-void Op_LD_HL_n16(CPU& cpu) {}  // LD HL, n16
+void Op_LD_HL_n16(CPU& cpu) {
+    uint16_t value = cpu.Fetch16();
+    cpu.GetRegisters()->HL = value;
+}  // LD HL, n16
 
-void Op_LD_SP_n16(CPU& cpu) {}  // LD SP, n16
+void Op_LD_SP_n16(CPU& cpu) {
+    uint16_t value = cpu.Fetch16();
+    cpu.GetRegisters()->SP = value;
+}  // LD SP, n16
 
-void Op_LD_BC_A(CPU& cpu) {}  // LD [BC], A
+void Op_LD_BC_A(CPU& cpu) {
+    uint8_t data = cpu.GetRegisters()->A;
+    uint16_t addr = cpu.GetRegisters()->BC;
+    cpu.GetRAM().Write(addr, data);
+}  // LD [BC], A
 
-void Op_LD_DE_A(CPU& cpu) {}  // LD [DE], A
+void Op_LD_DE_A(CPU& cpu) {
+    uint8_t data = cpu.GetRegisters()->A;
+    uint16_t addr = cpu.GetRegisters()->DE;
+    cpu.GetRAM().Write(addr, data);
+}  // LD [DE], A
 
-void Op_LD_HL_plus_A(CPU& cpu) {}  // LD [HL+], A
+void Op_LD_HL_plus_A(CPU& cpu) {
+    uint8_t data = cpu.GetRegisters()->A;
+    uint16_t addr = cpu.GetRegisters()->HL++;
+    cpu.GetRAM().Write(addr, data);
+}  // LD [HL+], A
 
-void Op_LD_HL_minus_A(CPU& cpu) {}  // LD [HL-], A
+void Op_LD_HL_minus_A(CPU& cpu) {
+    uint8_t data = cpu.GetRegisters()->A;
+    uint16_t addr = cpu.GetRegisters()->HL--;
+    cpu.GetRAM().Write(addr, data);
+}  // LD [HL-], A
 
 // Opcode table initialisation
 std::array<Opcode, 256> opcodeTable = {

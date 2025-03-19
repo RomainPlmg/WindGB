@@ -1,3 +1,7 @@
-#include "core/ram.h"
+#include "core/gb.h"
 
-int main(void) {}
+int main(void) {
+    auto console = new GB();
+    console->Run();
+    delete console;
+}
