@@ -75,6 +75,10 @@ class Registers {
         H = 0b00100000,
         C = 0b00010000
     };
+
+    void SetFlag(FlagBits flag, bool value);
+    bool GetFlag(FlagBits flag);
+    void ClearFlags();
 };
 
 #endif  // __REGISTERS_H__
