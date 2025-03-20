@@ -12,6 +12,7 @@ struct Opcode {
     std::string name;
     uint8_t size;
     uint8_t cycles;
+    uint8_t extraCycles;
     OpcodeFunc Execute;
 };
 
