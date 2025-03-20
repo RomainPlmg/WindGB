@@ -466,5 +466,69 @@ std::array<Opcode, 256> opcodeTable = {
     Opcode{"LD A, n8", 2, 2, 0, Op_LD_A_n8},            // 0x3E: Copy the value n8 into register A.
     Opcode{"CCF", 1, 1, 0, Op_CCF},                     // 0x3F: Complement Carry Flag.
     // Block 1: 8-bit register-to-register loads
+    Opcode{"LD B, B", 1, 1, 0, Op_LD_B_B},       // 0x40: Copy (aka Load) the value in B into B. -> TODO: Check if HALT
+    Opcode{"LD B, C", 1, 1, 0, Op_LD_B_C},       // 0x41: Copy (aka Load) the value in B into C.
+    Opcode{"LD B, D", 1, 1, 0, Op_LD_B_D},       // 0x42: Copy (aka Load) the value in B into D.
+    Opcode{"LD B, E", 1, 1, 0, Op_LD_B_E},       // 0x43: Copy (aka Load) the value in B into E.
+    Opcode{"LD B, H", 1, 1, 0, Op_LD_B_H},       // 0x44: Copy (aka Load) the value in B into H.
+    Opcode{"LD B, L", 1, 1, 0, Op_LD_B_L},       // 0x45: Copy (aka Load) the value in B into L.
+    Opcode{"LD B, [HL]", 1, 1, 0, Op_LD_B_pHL},  // 0x46: Copy (aka Load) the value in B into the byte pointed by HL.
+    Opcode{"LD B, A", 1, 1, 0, Op_LD_B_A},       // 0x47: Copy (aka Load) the value in B into A.
+    Opcode{"LD C, B", 1, 1, 0, Op_LD_C_B},       // 0x48: Copy (aka Load) the value in C into B.
+    Opcode{"LD C, C", 1, 1, 0, Op_LD_C_C},       // 0x49: Copy (aka Load) the value in C into C. -> TODO: Check if HALT
+    Opcode{"LD C, D", 1, 1, 0, Op_LD_C_D},       // 0x4A: Copy (aka Load) the value in C into D.
+    Opcode{"LD C, E", 1, 1, 0, Op_LD_C_E},       // 0x4B: Copy (aka Load) the value in C into E.
+    Opcode{"LD C, H", 1, 1, 0, Op_LD_C_H},       // 0x4C: Copy (aka Load) the value in C into H.
+    Opcode{"LD C, L", 1, 1, 0, Op_LD_C_L},       // 0x4D: Copy (aka Load) the value in C into L.
+    Opcode{"LD C, [HL]", 1, 1, 0, Op_LD_C_pHL},  // 0x4E: Copy (aka Load) the value in C into the byte pointed by HL.
+    Opcode{"LD C, A", 1, 1, 0, Op_LD_C_A},       // 0x4F: Copy (aka Load) the value in C into A.
+    Opcode{"LD D, B", 1, 1, 0, Op_LD_D_B},       // 0x50: Copy (aka Load) the value in D into B.
+    Opcode{"LD D, C", 1, 1, 0, Op_LD_D_C},       // 0x51: Copy (aka Load) the value in D into C.
+    Opcode{"LD D, D", 1, 1, 0, Op_LD_D_D},       // 0x52: Copy (aka Load) the value in D into D. -> TODO: Check if HALT
+    Opcode{"LD D, E", 1, 1, 0, Op_LD_D_E},       // 0x53: Copy (aka Load) the value in D into E.
+    Opcode{"LD D, H", 1, 1, 0, Op_LD_D_H},       // 0x54: Copy (aka Load) the value in D into H.
+    Opcode{"LD D, L", 1, 1, 0, Op_LD_D_L},       // 0x55: Copy (aka Load) the value in D into L.
+    Opcode{"LD D, [HL]", 1, 1, 0, Op_LD_D_pHL},  // 0x56: Copy (aka Load) the value in D into the byte pointed by HL.
+    Opcode{"LD D, A", 1, 1, 0, Op_LD_D_A},       // 0x57: Copy (aka Load) the value in D into A.
+    Opcode{"LD E, B", 1, 1, 0, Op_LD_E_B},       // 0x58: Copy (aka Load) the value in E into B.
+    Opcode{"LD E, C", 1, 1, 0, Op_LD_E_C},       // 0x59: Copy (aka Load) the value in E into C.
+    Opcode{"LD E, D", 1, 1, 0, Op_LD_E_D},       // 0x5A: Copy (aka Load) the value in E into D.
+    Opcode{"LD E, E", 1, 1, 0, Op_LD_E_E},       // 0x5B: Copy (aka Load) the value in E into E. -> TODO: Check if HALT
+    Opcode{"LD E, H", 1, 1, 0, Op_LD_E_H},       // 0x5C: Copy (aka Load) the value in E into H.
+    Opcode{"LD E, L", 1, 1, 0, Op_LD_E_L},       // 0x5D: Copy (aka Load) the value in E into L.
+    Opcode{"LD E, [HL]", 1, 1, 0, Op_LD_E_pHL},  // 0x5E: Copy (aka Load) the value in E into the byte pointed by HL.
+    Opcode{"LD E, A", 1, 1, 0, Op_LD_E_A},       // 0x5F: Copy (aka Load) the value in E into A.
+    Opcode{"LD H, B", 1, 1, 0, Op_LD_H_B},       // 0x60: Copy (aka Load) the value in H into B.
+    Opcode{"LD H, C", 1, 1, 0, Op_LD_H_C},       // 0x61: Copy (aka Load) the value in H into C.
+    Opcode{"LD H, D", 1, 1, 0, Op_LD_H_D},       // 0x62: Copy (aka Load) the value in H into D.
+    Opcode{"LD H, E", 1, 1, 0, Op_LD_H_E},       // 0x63: Copy (aka Load) the value in H into E.
+    Opcode{"LD H, H", 1, 1, 0, Op_LD_H_H},       // 0x64: Copy (aka Load) the value in H into H. -> TODO: Check if HALT
+    Opcode{"LD H, L", 1, 1, 0, Op_LD_H_L},       // 0x65: Copy (aka Load) the value in H into L.
+    Opcode{"LD H, [HL]", 1, 1, 0, Op_LD_H_pHL},  // 0x66: Copy (aka Load) the value in H into the byte pointed by HL.
+    Opcode{"LD H, A", 1, 1, 0, Op_LD_H_A},       // 0x67: Copy (aka Load) the value in H into A.
+    Opcode{"LD L, B", 1, 1, 0, Op_LD_L_B},       // 0x68: Copy (aka Load) the value in L into B.
+    Opcode{"LD L, C", 1, 1, 0, Op_LD_L_C},       // 0x69: Copy (aka Load) the value in L into C.
+    Opcode{"LD L, D", 1, 1, 0, Op_LD_L_D},       // 0x6A: Copy (aka Load) the value in L into D.
+    Opcode{"LD L, E", 1, 1, 0, Op_LD_L_E},       // 0x6B: Copy (aka Load) the value in L into E.
+    Opcode{"LD L, H", 1, 1, 0, Op_LD_L_H},       // 0x6C: Copy (aka Load) the value in L into H.
+    Opcode{"LD L, L", 1, 1, 0, Op_LD_L_L},       // 0x6D: Copy (aka Load) the value in L into L. -> TODO: Check if HALT
+    Opcode{"LD L, [HL]", 1, 1, 0, Op_LD_L_pHL},  // 0x6E: Copy (aka Load) the value in L into the byte pointed by HL.
+    Opcode{"LD L, A", 1, 1, 0, Op_LD_L_A},       // 0x6F: Copy (aka Load) the value in L into A.
+    Opcode{"LD [HL], B", 1, 1, 0, Op_LD_pHL_B},  // 0x70: Copy (aka Load) the byte pointed by HL into B.
+    Opcode{"LD [HL], C", 1, 1, 0, Op_LD_pHL_C},  // 0x71: Copy (aka Load) the byte pointed by HL into C.
+    Opcode{"LD [HL], D", 1, 1, 0, Op_LD_pHL_D},  // 0x72: Copy (aka Load) the byte pointed by HL into D.
+    Opcode{"LD [HL], E", 1, 1, 0, Op_LD_pHL_E},  // 0x73: Copy (aka Load) the byte pointed by HL into E.
+    Opcode{"LD [HL], H", 1, 1, 0, Op_LD_pHL_H},  // 0x74: Copy (aka Load) the byte pointed by HL into H.
+    Opcode{"LD [HL], L", 1, 1, 0, Op_LD_pHL_L},  // 0x75: Copy (aka Load) the byte pointed by HL into L.
+    Opcode{"HALT", 1, 0, 0, Op_HALT},            // 0x76: Enter CPU low-power consumption mode until an interrupt occurs.
+    Opcode{"LD [HL], A", 1, 1, 0, Op_LD_pHL_A},  // 0x77: Copy (aka Load) the byte pointed by HL into A.
+    Opcode{"LD A B", 1, 1, 0, Op_LD_A_B},        // 0x78: Copy (aka Load) the value in A into B.
+    Opcode{"LD A C", 1, 1, 0, Op_LD_A_C},        // 0x79: Copy (aka Load) the value in A into C.
+    Opcode{"LD A D", 1, 1, 0, Op_LD_A_D},        // 0x7A: Copy (aka Load) the value in A into D.
+    Opcode{"LD A E", 1, 1, 0, Op_LD_A_E},        // 0x7B: Copy (aka Load) the value in A into E.
+    Opcode{"LD A H", 1, 1, 0, Op_LD_A_H},        // 0x7C: Copy (aka Load) the value in A into H.
+    Opcode{"LD A L", 1, 1, 0, Op_LD_A_L},        // 0x7D: Copy (aka Load) the value in A into L.
+    Opcode{"LD A [HL]", 1, 1, 0, Op_LD_A_pHL},   // 0x7E: Copy (aka Load) the value in A into the byte pointed by HL.
+    Opcode{"LD A A", 1, 1, 0, Op_LD_A_A},        // 0x7F: Copy (aka Load) the value in A into A. -> TODO: Check if HALT
     // TODO: Add missing instructions
 };
