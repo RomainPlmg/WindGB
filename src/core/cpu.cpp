@@ -4,7 +4,7 @@
 #include "ram.h"
 #include "registers.h"
 
-CPU::CPU(RAM& memory) : m_RAM(memory) { m_Registers = std::make_unique<Registers>(); }
+CPU::CPU(RAM& memory) : m_RAM(memory), m_Cycles(0) { m_Registers = std::make_unique<Registers>(); }
 
 CPU::~CPU() {}
 
@@ -24,6 +24,8 @@ void CPU::RunNextInstruction() {
     uint8_t opcode = Fetch8();
     DecodeInstruction(opcode);
 }
+
+void CPU::AddCycles(uint64_t cycles) { m_Cycles += cycles; }
 
 Registers* CPU::GetRegisters() { return m_Registers.get(); }
 
