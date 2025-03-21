@@ -13,13 +13,11 @@ GB::~GB() {}
 
 void GB::Run() {
     // Write some data into the memory
-    m_RAM->Write(0x100, 0x01);  // Write immediate value into BC
-    m_RAM->Write(0x101, 0x34);  // The value MSB
-    m_RAM->Write(0x102, 0x12);  // The value LSB
+    m_RAM->Write(0x000D, 0x18);  // Jump relative with signed e8 value
+    m_RAM->Write(0x000E, 0x02);  // e8 value
 
-    m_CPU->GetRegisters()->PC = 0x100;  // Place the program counter on 0x100 addr
+    m_CPU->GetRegisters()->PC = 0x00D;  // Place the program counter on 0x00D addr
 
     // Run instruction
     m_CPU->RunNextInstruction();
-    int test = 0;  // Just a debug stop point
 }
