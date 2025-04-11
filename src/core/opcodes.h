@@ -408,8 +408,8 @@ static void Op_ADD_HL_BC(CPU& cpu) {  // ADD HL, BC
 
     // Set flags
     reg->SetFlag(Registers::FlagBits::N, false);
-    reg->SetFlag(Registers::FlagBits::H, ((regHL & 0xFFF) + (regBC & 0xFFF)) > 0xFFF);  // Half-carry if overflow on 11 bits
-    reg->SetFlag(Registers::FlagBits::C, result > 0xFFFF);                              // Carry if overflow on 16 bits
+    reg->SetFlag(Registers::FlagBits::H, ((regHL & 0x0FFF) + (regBC & 0x0FFF)) > 0x0FFF);  // Half-carry if overflow on 11 bits
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFFFF);                                 // Carry if overflow on 16 bits
 
     cpu.AddCycles(2);
 }
@@ -423,8 +423,8 @@ static void Op_ADD_HL_DE(CPU& cpu) {  // ADD HL, DE
 
     // Set flags
     reg->SetFlag(Registers::FlagBits::N, false);
-    reg->SetFlag(Registers::FlagBits::H, ((regHL & 0xFFF) + (regDE & 0xFFF)) > 0xFFF);  // Half-carry if overflow on 11 bits
-    reg->SetFlag(Registers::FlagBits::C, result > 0xFFFF);                              // Carry if overflow on 16 bits
+    reg->SetFlag(Registers::FlagBits::H, ((regHL & 0x0FFF) + (regDE & 0x0FFF)) > 0x0FFF);  // Half-carry if overflow on 11 bits
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFFFF);                                 // Carry if overflow on 16 bits
 
     cpu.AddCycles(2);
 }
@@ -437,8 +437,8 @@ static void Op_ADD_HL_HL(CPU& cpu) {  // ADD HL, HL
 
     // Set flags
     reg->SetFlag(Registers::FlagBits::N, false);
-    reg->SetFlag(Registers::FlagBits::H, ((regHL & 0xFFF) + (regHL & 0xFFF)) > 0xFFF);  // Half-carry if overflow on 11 bits
-    reg->SetFlag(Registers::FlagBits::C, result > 0xFFFF);                              // Carry if overflow on 16 bits
+    reg->SetFlag(Registers::FlagBits::H, ((regHL & 0x0FFF) + (regHL & 0x0FFF)) > 0x0FFF);  // Half-carry if overflow on 11 bits
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFFFF);                                 // Carry if overflow on 16 bits
 
     cpu.AddCycles(2);
 }
@@ -452,8 +452,8 @@ static void Op_ADD_HL_SP(CPU& cpu) {  // ADD HL, DE
 
     // Set flags
     reg->SetFlag(Registers::FlagBits::N, false);
-    reg->SetFlag(Registers::FlagBits::H, ((regHL & 0xFFF) + (regSP & 0xFFF)) > 0xFFF);  // Half-carry if overflow on 11 bits
-    reg->SetFlag(Registers::FlagBits::C, result > 0xFFFF);                              // Carry if overflow on 16 bits
+    reg->SetFlag(Registers::FlagBits::H, ((regHL & 0x0FFF) + (regSP & 0x0FFF)) > 0x0FFF);  // Half-carry if overflow on 11 bits
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFFFF);                                 // Carry if overflow on 16 bits
 
     cpu.AddCycles(2);
 }
@@ -796,13 +796,39 @@ static void Op_LD_C_pHL(CPU& cpu) {  // LD C, [HL]
     cpu.AddCycles(1);
 }
 
-static void Op_LD_D_A(CPU& cpu) {}
-static void Op_LD_D_B(CPU& cpu) {}
-static void Op_LD_D_C(CPU& cpu) {}
-static void Op_LD_D_D(CPU& cpu) { cpu.AddCycles(1); }
-static void Op_LD_D_E(CPU& cpu) {}
-static void Op_LD_D_H(CPU& cpu) {}
-static void Op_LD_D_L(CPU& cpu) {}
+static void Op_LD_D_A(CPU& cpu) {  // LD D, A
+    Registers* reg = cpu.GetRegisters();
+    reg->D = reg->A;
+    cpu.AddCycles(1);
+}
+static void Op_LD_D_B(CPU& cpu) {  // LD D, B
+    Registers* reg = cpu.GetRegisters();
+    reg->D = reg->B;
+    cpu.AddCycles(1);
+}
+static void Op_LD_D_C(CPU& cpu) {  // LD D, C
+    Registers* reg = cpu.GetRegisters();
+    reg->D = reg->C;
+    cpu.AddCycles(1);
+}
+static void Op_LD_D_D(CPU& cpu) {  // LD D, D
+    cpu.AddCycles(1);
+}
+static void Op_LD_D_E(CPU& cpu) {  // LD D, E
+    Registers* reg = cpu.GetRegisters();
+    reg->D = reg->E;
+    cpu.AddCycles(1);
+}
+static void Op_LD_D_H(CPU& cpu) {  // LD D, H
+    Registers* reg = cpu.GetRegisters();
+    reg->D = reg->H;
+    cpu.AddCycles(1);
+}
+static void Op_LD_D_L(CPU& cpu) {  // LD D, L
+    Registers* reg = cpu.GetRegisters();
+    reg->D = reg->L;
+    cpu.AddCycles(1);
+}
 static void Op_LD_D_pHL(CPU& cpu) {  // LD D, [HL]
     Registers* reg = cpu.GetRegisters();
     uint8_t value = cpu.GetRAM().Read(reg->HL);
@@ -810,13 +836,39 @@ static void Op_LD_D_pHL(CPU& cpu) {  // LD D, [HL]
     cpu.AddCycles(1);
 }
 
-static void Op_LD_E_A(CPU& cpu) {}
-static void Op_LD_E_B(CPU& cpu) {}
-static void Op_LD_E_C(CPU& cpu) {}
-static void Op_LD_E_D(CPU& cpu) {}
-static void Op_LD_E_E(CPU& cpu) { cpu.AddCycles(1); }
-static void Op_LD_E_H(CPU& cpu) {}
-static void Op_LD_E_L(CPU& cpu) {}
+static void Op_LD_E_A(CPU& cpu) {  // LD E, A
+    Registers* reg = cpu.GetRegisters();
+    reg->E = reg->A;
+    cpu.AddCycles(1);
+}
+static void Op_LD_E_B(CPU& cpu) {  // LD E, B
+    Registers* reg = cpu.GetRegisters();
+    reg->E = reg->B;
+    cpu.AddCycles(1);
+}
+static void Op_LD_E_C(CPU& cpu) {  // LD E, C
+    Registers* reg = cpu.GetRegisters();
+    reg->E = reg->C;
+    cpu.AddCycles(1);
+}
+static void Op_LD_E_D(CPU& cpu) {  // LD E, D
+    Registers* reg = cpu.GetRegisters();
+    reg->E = reg->D;
+    cpu.AddCycles(1);
+}
+static void Op_LD_E_E(CPU& cpu) {  // LD E, E
+    cpu.AddCycles(1);
+}
+static void Op_LD_E_H(CPU& cpu) {  // LD E, H
+    Registers* reg = cpu.GetRegisters();
+    reg->E = reg->H;
+    cpu.AddCycles(1);
+}
+static void Op_LD_E_L(CPU& cpu) {  // LD E, L
+    Registers* reg = cpu.GetRegisters();
+    reg->E = reg->L;
+    cpu.AddCycles(1);
+}
 static void Op_LD_E_pHL(CPU& cpu) {  // LD E, [HL]
     Registers* reg = cpu.GetRegisters();
     uint8_t value = cpu.GetRAM().Read(reg->HL);
@@ -824,13 +876,39 @@ static void Op_LD_E_pHL(CPU& cpu) {  // LD E, [HL]
     cpu.AddCycles(1);
 }
 
-static void Op_LD_H_A(CPU& cpu) {}
-static void Op_LD_H_B(CPU& cpu) {}
-static void Op_LD_H_C(CPU& cpu) {}
-static void Op_LD_H_D(CPU& cpu) {}
-static void Op_LD_H_E(CPU& cpu) {}
-static void Op_LD_H_H(CPU& cpu) { cpu.AddCycles(1); }
-static void Op_LD_H_L(CPU& cpu) {}
+static void Op_LD_H_A(CPU& cpu) {  // LD H, A
+    Registers* reg = cpu.GetRegisters();
+    reg->H = reg->A;
+    cpu.AddCycles(1);
+}
+static void Op_LD_H_B(CPU& cpu) {  // LD H, B
+    Registers* reg = cpu.GetRegisters();
+    reg->H = reg->B;
+    cpu.AddCycles(1);
+}
+static void Op_LD_H_C(CPU& cpu) {  // LD H, C
+    Registers* reg = cpu.GetRegisters();
+    reg->H = reg->C;
+    cpu.AddCycles(1);
+}
+static void Op_LD_H_D(CPU& cpu) {  // LD H, D
+    Registers* reg = cpu.GetRegisters();
+    reg->H = reg->D;
+    cpu.AddCycles(1);
+}
+static void Op_LD_H_E(CPU& cpu) {  // LD H, E
+    Registers* reg = cpu.GetRegisters();
+    reg->H = reg->E;
+    cpu.AddCycles(1);
+}
+static void Op_LD_H_H(CPU& cpu) {  // LD H, H
+    cpu.AddCycles(1);
+}
+static void Op_LD_H_L(CPU& cpu) {  // LD H, L
+    Registers* reg = cpu.GetRegisters();
+    reg->H = reg->L;
+    cpu.AddCycles(1);
+}
 static void Op_LD_H_pHL(CPU& cpu) {  // LD H, [HL]
     Registers* reg = cpu.GetRegisters();
     uint8_t value = cpu.GetRAM().Read(reg->HL);
@@ -838,13 +916,39 @@ static void Op_LD_H_pHL(CPU& cpu) {  // LD H, [HL]
     cpu.AddCycles(1);
 }
 
-static void Op_LD_L_A(CPU& cpu) {}
-static void Op_LD_L_B(CPU& cpu) {}
-static void Op_LD_L_C(CPU& cpu) {}
-static void Op_LD_L_D(CPU& cpu) {}
-static void Op_LD_L_E(CPU& cpu) {}
-static void Op_LD_L_H(CPU& cpu) {}
-static void Op_LD_L_L(CPU& cpu) { cpu.AddCycles(1); }
+static void Op_LD_L_A(CPU& cpu) {  // LD L, A
+    Registers* reg = cpu.GetRegisters();
+    reg->L = reg->A;
+    cpu.AddCycles(1);
+}
+static void Op_LD_L_B(CPU& cpu) {  // LD L, B
+    Registers* reg = cpu.GetRegisters();
+    reg->L = reg->B;
+    cpu.AddCycles(1);
+}
+static void Op_LD_L_C(CPU& cpu) {  // LD L, C
+    Registers* reg = cpu.GetRegisters();
+    reg->L = reg->C;
+    cpu.AddCycles(1);
+}
+static void Op_LD_L_D(CPU& cpu) {  // LD L, D
+    Registers* reg = cpu.GetRegisters();
+    reg->L = reg->D;
+    cpu.AddCycles(1);
+}
+static void Op_LD_L_E(CPU& cpu) {  // LD L, E
+    Registers* reg = cpu.GetRegisters();
+    reg->L = reg->E;
+    cpu.AddCycles(1);
+}
+static void Op_LD_L_H(CPU& cpu) {  // LD L, H
+    Registers* reg = cpu.GetRegisters();
+    reg->L = reg->H;
+    cpu.AddCycles(1);
+}
+static void Op_LD_L_L(CPU& cpu) {  // LD L, L
+    cpu.AddCycles(1);
+}
 static void Op_LD_L_pHL(CPU& cpu) {  // LD L, [HL]
     Registers* reg = cpu.GetRegisters();
     uint8_t value = cpu.GetRAM().Read(reg->HL);
@@ -852,46 +956,426 @@ static void Op_LD_L_pHL(CPU& cpu) {  // LD L, [HL]
     cpu.AddCycles(1);
 }
 
-static void Op_LD_pHL_A(CPU& cpu) {}
-static void Op_LD_pHL_B(CPU& cpu) {}
-static void Op_LD_pHL_C(CPU& cpu) {}
-static void Op_LD_pHL_D(CPU& cpu) {}
-static void Op_LD_pHL_E(CPU& cpu) {}
-static void Op_LD_pHL_H(CPU& cpu) {}
-static void Op_LD_pHL_L(CPU& cpu) {}
+/** LD [HL],r8 *************************************************************************************************************/
+static void Op_LD_pHL_A(CPU& cpu) {  // LD [HL], A
+    Registers* reg = cpu.GetRegisters();
+    cpu.GetRAM().Write(reg->HL, reg->A);
+    cpu.AddCycles(2);
+}
+static void Op_LD_pHL_B(CPU& cpu) {  // LD [HL], B
+    Registers* reg = cpu.GetRegisters();
+    cpu.GetRAM().Write(reg->HL, reg->B);
+    cpu.AddCycles(2);
+}
+static void Op_LD_pHL_C(CPU& cpu) {  // LD [HL], C
+    Registers* reg = cpu.GetRegisters();
+    cpu.GetRAM().Write(reg->HL, reg->C);
+    cpu.AddCycles(2);
+}
+static void Op_LD_pHL_D(CPU& cpu) {  // LD [HL], D
+    Registers* reg = cpu.GetRegisters();
+    cpu.GetRAM().Write(reg->HL, reg->D);
+    cpu.AddCycles(2);
+}
+static void Op_LD_pHL_E(CPU& cpu) {  // LD [HL], E
+    Registers* reg = cpu.GetRegisters();
+    cpu.GetRAM().Write(reg->HL, reg->E);
+    cpu.AddCycles(2);
+}
+static void Op_LD_pHL_H(CPU& cpu) {  // LD [HL], H
+    Registers* reg = cpu.GetRegisters();
+    cpu.GetRAM().Write(reg->HL, reg->H);
+    cpu.AddCycles(2);
+}
+static void Op_LD_pHL_L(CPU& cpu) {  // LD [HL], L
+    Registers* reg = cpu.GetRegisters();
+    cpu.GetRAM().Write(reg->HL, reg->L);
+    cpu.AddCycles(2);
+}
 
-/** HALT *************************************************************************************************************/
+/** HALT ************************************************************************************************************/
 static void Op_HALT(CPU& cpu) {}
 
 /** ADD A,r8 ********************************************************************************************************/
-static void Op_ADD_A_A(CPU& cpu) {}
-static void Op_ADD_A_B(CPU& cpu) {}
-static void Op_ADD_A_C(CPU& cpu) {}
-static void Op_ADD_A_D(CPU& cpu) {}
-static void Op_ADD_A_E(CPU& cpu) {}
-static void Op_ADD_A_H(CPU& cpu) {}
-static void Op_ADD_A_L(CPU& cpu) {}
-static void Op_ADD_A_pHL(CPU& cpu) {}
+static void Op_ADD_A_A(CPU& cpu) {  // ADD A, A
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint16_t result = regA + regA;  // uint16_t to detect overflow
+    reg->A = result & 0xFF;         // Keep only the fist 8 bits
+
+    // Set flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, false);
+    reg->SetFlag(Registers::FlagBits::H, ((regA & 0x0F) + (regA & 0x0F)) > 0x0F);  // Half-carry if carry from bit 3 to bit 4
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);                           // Carry if overflow on 7 bits
+
+    cpu.AddCycles(1);
+}
+static void Op_ADD_A_B(CPU& cpu) {  // ADD A, B
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint16_t result = regA + reg->B;  // uint16_t to detect overflow
+    reg->A = result & 0xFF;           // Keep only the fist 8 bits
+
+    // Set flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, false);
+    reg->SetFlag(Registers::FlagBits::H, ((regA & 0x0F) + (reg->B & 0x0F)) > 0x0F);  // Half-carry if carry from bit 3 to bit 4
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);                             // Carry if overflow on 7 bits
+
+    cpu.AddCycles(1);
+}
+static void Op_ADD_A_C(CPU& cpu) {  // ADD A, C
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint16_t result = regA + reg->C;  // uint16_t to detect overflow
+    reg->A = result & 0xFF;           // Keep only the fist 8 bits
+
+    // Set flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, false);
+    reg->SetFlag(Registers::FlagBits::H, ((regA & 0x0F) + (reg->C & 0x0F)) > 0x0F);  // Half-carry if carry from bit 3 to bit 4
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);                             // Carry if overflow on 7 bits
+
+    cpu.AddCycles(1);
+}
+static void Op_ADD_A_D(CPU& cpu) {  // ADD A, D
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint16_t result = regA + reg->C;  // uint16_t to detect overflow
+    reg->A = result & 0xFF;           // Keep only the fist 8 bits
+
+    // Set flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, false);
+    reg->SetFlag(Registers::FlagBits::H, ((regA & 0x0F) + (reg->C & 0x0F)) > 0x0F);  // Half-carry if carry from bit 3 to bit 4
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);                             // Carry if overflow on 7 bits
+
+    cpu.AddCycles(1);
+}
+static void Op_ADD_A_E(CPU& cpu) {  // ADD A, E
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint16_t result = regA + reg->E;  // uint16_t to detect overflow
+    reg->A = result & 0xFF;           // Keep only the fist 8 bits
+
+    // Set flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, false);
+    reg->SetFlag(Registers::FlagBits::H, ((regA & 0x0F) + (reg->E & 0x0F)) > 0x0F);  // Half-carry if carry from bit 3 to bit 4
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);                             // Carry if overflow on 7 bits
+
+    cpu.AddCycles(1);
+}
+static void Op_ADD_A_H(CPU& cpu) {  // ADD A, H
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint16_t result = regA + reg->H;  // uint16_t to detect overflow
+    reg->A = result & 0xFF;           // Keep only the fist 8 bits
+
+    // Set flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, false);
+    reg->SetFlag(Registers::FlagBits::H, ((regA & 0x0F) + (reg->H & 0x0F)) > 0x0F);  // Half-carry if carry from bit 3 to bit 4
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);                             // Carry if overflow on 7 bits
+
+    cpu.AddCycles(1);
+}
+static void Op_ADD_A_L(CPU& cpu) {  // ADD A, L
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint16_t result = regA + reg->L;  // uint16_t to detect overflow
+    reg->A = result & 0xFF;           // Keep only the fist 8 bits
+
+    // Set flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, false);
+    reg->SetFlag(Registers::FlagBits::H, ((regA & 0x0F) + (reg->L & 0x0F)) > 0x0F);  // Half-carry if carry from bit 3 to bit 4
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);                             // Carry if overflow on 7 bits
+
+    cpu.AddCycles(1);
+}
+
+/** ADD A,[HL] ******************************************************************************************************/
+static void Op_ADD_A_pHL(CPU& cpu) {  // ADD A, [HL]
+    Registers* reg = cpu.GetRegisters();
+    uint8_t value = cpu.GetRAM().Read(reg->HL);
+    uint8_t regA = reg->A;
+
+    uint16_t result = regA + value;  // uint16_t to detect overflow
+    reg->A = result & 0xFF;          // Keep only the fist 8 bits
+
+    // Set flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, false);
+    reg->SetFlag(Registers::FlagBits::H, ((regA & 0x0F) + (value & 0x0F)) > 0x0F);  // Half-carry if carry from bit 3 to bit 4
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);                            // Carry if overflow on 7 bits
+
+    cpu.AddCycles(2);
+}
 
 /** ADC A,r8 ********************************************************************************************************/
-static void Op_ADC_A_A(CPU& cpu) {}
-static void Op_ADC_A_B(CPU& cpu) {}
-static void Op_ADC_A_C(CPU& cpu) {}
-static void Op_ADC_A_D(CPU& cpu) {}
-static void Op_ADC_A_E(CPU& cpu) {}
-static void Op_ADC_A_H(CPU& cpu) {}
-static void Op_ADC_A_L(CPU& cpu) {}
-static void Op_ADC_A_pHL(CPU& cpu) {}
+static void Op_ADC_A_A(CPU& cpu) {  // ADC A, A
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint8_t carry = reg->GetFlag(Registers::FlagBits::C);
+    uint16_t result = regA + regA + carry;  // uint16_t to detect overflow
+    reg->A = result & 0xFF;                 // Keep only the fist 8 bits
+
+    // Set flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, false);
+    reg->SetFlag(Registers::FlagBits::H, ((regA & 0x0F) + (regA & 0x0F) + carry) > 0x0F);  // Half-carry if carry from bit 3 to bit 4
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);                                   // Carry if overflow on 7 bits
+
+    cpu.AddCycles(1);
+}
+static void Op_ADC_A_B(CPU& cpu) {  // ADC A, B
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint8_t carry = reg->GetFlag(Registers::FlagBits::C);
+    uint16_t result = regA + reg->B + carry;  // uint16_t to detect overflow
+    reg->A = result & 0xFF;                   // Keep only the fist 8 bits
+
+    // Set flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, false);
+    reg->SetFlag(Registers::FlagBits::H, ((regA & 0x0F) + (reg->B & 0x0F) + carry) > 0x0F);  // Half-carry if carry from bit 3 to bit 4
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);                                     // Carry if overflow on 7 bits
+
+    cpu.AddCycles(1);
+}
+static void Op_ADC_A_C(CPU& cpu) {  // ADC A, C
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint8_t carry = reg->GetFlag(Registers::FlagBits::C);
+    uint16_t result = regA + reg->C + carry;  // uint16_t to detect overflow
+    reg->A = result & 0xFF;                   // Keep only the fist 8 bits
+
+    // Set flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, false);
+    reg->SetFlag(Registers::FlagBits::H, ((regA & 0x0F) + (reg->C & 0x0F) + carry) > 0x0F);  // Half-carry if carry from bit 3 to bit 4
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);                                     // Carry if overflow on 7 bits
+
+    cpu.AddCycles(1);
+}
+static void Op_ADC_A_D(CPU& cpu) {  // ADC A, D
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint8_t carry = reg->GetFlag(Registers::FlagBits::C);
+    uint16_t result = regA + reg->D + carry;  // uint16_t to detect overflow
+    reg->A = result & 0xFF;                   // Keep only the fist 8 bits
+
+    // Set flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, false);
+    reg->SetFlag(Registers::FlagBits::H, ((regA & 0x0F) + (reg->D & 0x0F) + carry) > 0x0F);  // Half-carry if carry from bit 3 to bit 4
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);                                     // Carry if overflow on 7 bits
+
+    cpu.AddCycles(1);
+}
+static void Op_ADC_A_E(CPU& cpu) {  // ADC A, E
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint8_t carry = reg->GetFlag(Registers::FlagBits::C);
+    uint16_t result = regA + reg->E + carry;  // uint16_t to detect overflow
+    reg->A = result & 0xFF;                   // Keep only the fist 8 bits
+
+    // Set flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, false);
+    reg->SetFlag(Registers::FlagBits::H, ((regA & 0x0F) + (reg->E & 0x0F) + carry) > 0x0F);  // Half-carry if carry from bit 3 to bit 4
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);                                     // Carry if overflow on 7 bits
+
+    cpu.AddCycles(1);
+}
+static void Op_ADC_A_H(CPU& cpu) {  // ADC A, H
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint8_t carry = reg->GetFlag(Registers::FlagBits::C);
+    uint16_t result = regA + reg->H + carry;  // uint16_t to detect overflow
+    reg->A = result & 0xFF;                   // Keep only the fist 8 bits
+
+    // Set flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, false);
+    reg->SetFlag(Registers::FlagBits::H, ((regA & 0x0F) + (reg->H & 0x0F) + carry) > 0x0F);  // Half-carry if carry from bit 3 to bit 4
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);                                     // Carry if overflow on 7 bits
+
+    cpu.AddCycles(1);
+}
+static void Op_ADC_A_L(CPU& cpu) {  // ADC A, L
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint8_t carry = reg->GetFlag(Registers::FlagBits::C);
+    uint16_t result = regA + reg->L + carry;  // uint16_t to detect overflow
+    reg->A = result & 0xFF;                   // Keep only the fist 8 bits
+
+    // Set flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, false);
+    reg->SetFlag(Registers::FlagBits::H, ((regA & 0x0F) + (reg->L & 0x0F) + carry) > 0x0F);  // Half-carry if carry from bit 3 to bit 4
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);                                     // Carry if overflow on 7 bits
+
+    cpu.AddCycles(1);
+}
+
+/** ADC A,[HL] ********************************************************************************************************/
+static void Op_ADC_A_pHL(CPU& cpu) {  // ADC A, [HL]
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint8_t value = cpu.GetRAM().Read(reg->HL);
+    uint8_t carry = reg->GetFlag(Registers::FlagBits::C);
+    uint16_t result = regA + value + carry;  // uint16_t to detect overflow
+    reg->A = result & 0xFF;                  // Keep only the fist 8 bits
+
+    // Set flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, false);
+    reg->SetFlag(Registers::FlagBits::H, ((regA & 0x0F) + (value & 0x0F) + carry) > 0x0F);  // Half-carry if carry from bit 3 to bit 4
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);                                    // Carry if overflow on 7 bits
+
+    cpu.AddCycles(2);
+}
 
 /** SUB A,r8 ********************************************************************************************************/
-static void Op_SUB_A_A(CPU& cpu) {}
-static void Op_SUB_A_B(CPU& cpu) {}
-static void Op_SUB_A_C(CPU& cpu) {}
-static void Op_SUB_A_D(CPU& cpu) {}
-static void Op_SUB_A_E(CPU& cpu) {}
-static void Op_SUB_A_H(CPU& cpu) {}
-static void Op_SUB_A_L(CPU& cpu) {}
-static void Op_SUB_A_pHL(CPU& cpu) {}
+static void Op_SUB_A_A(CPU& cpu) {  // SUB A, A
+    Registers* reg = cpu.GetRegisters();
+
+    reg->A = 0;  // Because A - A = 0
+
+    // Flags
+    reg->SetFlag(Registers::FlagBits::Z, true);
+    reg->SetFlag(Registers::FlagBits::N, true);
+    reg->SetFlag(Registers::FlagBits::H, false);
+    reg->SetFlag(Registers::FlagBits::C, false);
+
+    cpu.AddCycles(1);
+}
+static void Op_SUB_A_B(CPU& cpu) {  // SUB A, B
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint16_t result = regA - reg->B;  // uint16_t to detect borrow
+    reg->A = result & 0xFF;           // Keep only the fist 8 bits
+
+    // Flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, true);
+    reg->SetFlag(Registers::FlagBits::H, (regA & 0x0F) < (reg->B & 0x0F));
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);
+
+    cpu.AddCycles(1);
+}
+static void Op_SUB_A_C(CPU& cpu) {  // SUB A, C
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint16_t result = regA - reg->C;  // uint16_t to detect borrow
+    reg->A = result & 0xFF;           // Keep only the fist 8 bits
+
+    // Flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, true);
+    reg->SetFlag(Registers::FlagBits::H, (regA & 0x0F) < (reg->C & 0x0F));
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);
+
+    cpu.AddCycles(1);
+}
+static void Op_SUB_A_D(CPU& cpu) {  // SUB A, D
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint16_t result = regA - reg->D;  // uint16_t to detect borrow
+    reg->A = result & 0xFF;           // Keep only the fist 8 bits
+
+    // Flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, true);
+    reg->SetFlag(Registers::FlagBits::H, (regA & 0x0F) < (reg->D & 0x0F));
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);
+
+    cpu.AddCycles(1);
+}
+static void Op_SUB_A_E(CPU& cpu) {  // SUB A, E
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint16_t result = regA - reg->E;  // uint16_t to detect borrow
+    reg->A = result & 0xFF;           // Keep only the fist 8 bits
+
+    // Flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, true);
+    reg->SetFlag(Registers::FlagBits::H, (regA & 0x0F) < (reg->E & 0x0F));
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);
+
+    cpu.AddCycles(1);
+}
+static void Op_SUB_A_H(CPU& cpu) {  // SUB A, H
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint16_t result = regA - reg->H;  // uint16_t to detect borrow
+    reg->A = result & 0xFF;           // Keep only the fist 8 bits
+
+    // Flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, true);
+    reg->SetFlag(Registers::FlagBits::H, (regA & 0x0F) < (reg->H & 0x0F));
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);
+
+    cpu.AddCycles(1);
+}
+static void Op_SUB_A_L(CPU& cpu) {  // SUB A, L
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+
+    uint16_t result = regA - reg->L;  // uint16_t to detect borrow
+    reg->A = result & 0xFF;           // Keep only the fist 8 bits
+
+    // Flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, true);
+    reg->SetFlag(Registers::FlagBits::H, (regA & 0x0F) < (reg->L & 0x0F));
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);
+
+    cpu.AddCycles(1);
+}
+
+/** SUB A,[HL] ******************************************************************************************************/
+static void Op_SUB_A_pHL(CPU& cpu) {  // SUB A, [HL]
+    Registers* reg = cpu.GetRegisters();
+    uint8_t regA = reg->A;
+    uint8_t value = cpu.GetRAM().Read(reg->HL);
+
+    uint16_t result = regA - value;  // uint16_t to detect borrow
+    reg->A = result & 0xFF;          // Keep only the fist 8 bits
+
+    // Flags
+    reg->SetFlag(Registers::FlagBits::Z, reg->A == 0);
+    reg->SetFlag(Registers::FlagBits::N, true);
+    reg->SetFlag(Registers::FlagBits::H, (regA & 0x0F) < (value & 0x0F));
+    reg->SetFlag(Registers::FlagBits::C, result > 0xFF);
+
+    cpu.AddCycles(2);
+}
 
 /** SBC A,r8 ********************************************************************************************************/
 static void Op_SBC_A_A(CPU& cpu) {}
