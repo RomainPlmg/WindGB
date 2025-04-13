@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cstdint>
+#include <vector>
 
 //
 //      +------------+------------+-------------+--------------------------------+
@@ -23,14 +24,20 @@
 //      +------------+------------+-------------+--------------------------------+
 //
 
-class RAM {
+class Memory {
    public:
-    RAM();
+    Memory();
     uint8_t Read(uint16_t addr) const;
     void Write(uint16_t addr, uint8_t data);
 
+    void LoadROM(const std::vector<uint8_t>& rom);
+
+    /* Getters */
+    uint8_t GetIE() const { return m_Memory[0xFFFF]; }
+    uint8_t GetIF() const { return m_Memory[0xFF0F]; }
+
    private:
-    std::array<uint8_t, 655336> m_Memory;
+    std::array<uint8_t, 65536> m_Memory;
 };
 
 #endif  // __RAM_H__

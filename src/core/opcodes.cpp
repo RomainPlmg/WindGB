@@ -265,5 +265,4 @@ std::array<Opcode, 256> opcodeTable = {
     Opcode{"INVALID", 0, 0, 0, Op_Invalid},                // 0xFD: INVALID
     Opcode{"CP A, n8", 2, 3, 0, Op_CP_A_n8},               // 0xFE: ComPare the value in A with the value n8.
     Opcode{"RST 38H", 1, 4, 0, Op_RST_38H},                // 0xFF: Call address 0x0038.
-    // TODO: Add missing instructions
 };

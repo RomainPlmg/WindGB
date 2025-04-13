@@ -1,6 +1,6 @@
-[submodule "libs/glfw"]
-	path = libs/glfw
-	url = https://github.com/glfw/glfw.git
 [submodule "libs/gb-test-roms"]
 	path = libs/gb-test-roms
 	url = https://github.com/retrio/gb-test-roms.git
+[submodule "libs/sfml"]
+	path = libs/sfml
+	url = https://github.com/SFML/SFML.git
