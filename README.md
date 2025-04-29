@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/WindGB_logo.png" alt="WindGB Logo" width="256" style="image-rendering: pixelated;" />
+</p>
+
 # 🕹️ WindGB - GameBoy Emulator
 
 WindGB is a **GameBoy** emulator written in C++. It is designed to be performant and accurate in executing the GameBoy's instructions. This project uses **Blargg’s tests** to ensure compatibility and correctness of the emulator.
