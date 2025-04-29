@@ -1,8 +1,9 @@
-#ifndef __REGISTERS_H__
-#define __REGISTERS_H__
+#pragma once
 
 #include <array>
 #include <cstdint>
+
+#include "common.h"
 
 //
 //       +---------------------------+
@@ -31,54 +32,50 @@
 //          |       16-BIT        |
 //
 
-class Registers {
-   public:
+struct Registers {
     union {
         struct {
             union {
                 struct {
-                    uint8_t F;  // Flags (Z: Zero | N: Negative | C: Carry | H: Half-carry)
-                    uint8_t A;  // General purpose | Accumulator
+                    u8 F;  // Flags (Z: Zero | N: Negative | C: Carry | H: Half-carry)
+                    u8 A;  // General purpose | Accumulator
                 };
-                uint16_t AF;
+                u16 AF;
             };
             union {
                 struct {
-                    uint8_t C;  // General purpose
-                    uint8_t B;  // General purpose
+                    u8 C;  // General purpose
+                    u8 B;  // General purpose
                 };
-                uint16_t BC;
+                u16 BC;
             };
             union {
                 struct {
-                    uint8_t E;  // General purpose
-                    uint8_t D;  // General purpose
+                    u8 E;  // General purpose
+                    u8 D;  // General purpose
                 };
-                uint16_t DE;
+                u16 DE;
             };
             union {
                 struct {
-                    uint8_t L;  // General purpose
-                    uint8_t H;  // General purpose
+                    u8 L;  // General purpose
+                    u8 H;  // General purpose
                 };
-                uint16_t HL;
+                u16 HL;
             };
         };
     };
 
-    uint16_t SP = 0;  // Stack pointer
-    uint16_t PC = 0;  // Program counter
+    u16 SP = 0;  // Stack pointer
+    u16 PC = 0;  // Program counter
 
-    enum class FlagBits {
+    enum class Flag {
         Z = 0b10000000,  // Zero flag
         N = 0b01000000,
         H = 0b00100000,
         C = 0b00010000
     };
 
-    void SetFlag(FlagBits flag, bool value);
-    bool GetFlag(FlagBits flag);
-    void ClearFlags();
+    void SetFlag(Flag flag, bool value);
+    bool GetFlag(Flag flag);
 };
-
-#endif  // __REGISTERS_H__

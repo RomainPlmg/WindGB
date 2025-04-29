@@ -1,0 +1,78 @@
+#include "emu.h"
+
+#include <argparse/argparse.hpp>
+#include <atomic>
+#include <csignal>
+
+#include "bus.h"
+#include "cartridge.h"
+#include "cpu.h"
+#include "exit_codes.h"
+#include "log.h"
+
+std::atomic<bool> g_ExitRequested = false;
+std::atomic<int> g_ExitSignal{0};
+
+Gameboy::Gameboy(int argc, char const *argv[]) {
+    std::string romPath = {};
+    std::string outputFile = {};
+    bool debug = false;
+    bool gbd = false;
+
+    argparse::ArgumentParser parser("WindGB", "0.1.0");
+    parser.add_argument("rom_path").help("Path to the ROM to load into the emulator.").store_into(romPath);
+    parser.add_argument("-d", "--debug").default_value(false).implicit_value(true).help("Enable standard logging").store_into(debug);
+    parser.add_argument("--gameboy_doctor").default_value(false).implicit_value(true).help("Enable logging for Gameboy Doctor tests. (Disable the standard logging)").store_into(gbd);
+    parser.add_argument("-o", "--output").help("Log output file.").store_into(outputFile);
+    parser.parse_args(argc, argv);
+
+    Log::Init(outputFile);
+    Log::InitDoctor(outputFile);
+
+    if (gbd) {
+        Log::Disable();
+    } else if (debug) {
+        Log::DisableDoctor();
+    } else {
+        Log::Disable();
+        Log::DisableDoctor();
+    }
+
+    m_Cartridge = std::make_unique<Cartridge>();
+    m_Bus = std::make_unique<Bus>(m_Cartridge.get());
+    m_CPU = std::make_unique<CPU>(*m_Bus);
+
+    if (argc < 2) {
+        LOG_CRITICAL("You need to specify a binary to load");
+        exit(EXIT_INVALID_ARGS);
+    }
+
+    m_Cartridge->Load(romPath);
+}
+
+void Gameboy::Run() {
+    std::signal(SIGINT, signal_callback_handler);  // Register signal and signal handler
+    m_CPU->Reset();                                // Reset the CPU at the initial state
+
+    while (m_Running) {
+        if (g_ExitRequested) {
+            HandleAsyncExit();
+        }
+
+        m_CPU->Step();
+    }
+}
+
+void Gameboy::HandleAsyncExit() {
+    LOG_INFO("Caught signal '{}'", g_ExitSignal.load());
+    Log::Get()->flush();
+    Log::GetDoctor()->flush();
+    spdlog::shutdown();
+
+    std::exit(g_ExitSignal.load());
+}
+
+void Gameboy::signal_callback_handler(int signum) {
+    g_ExitRequested = true;
+    g_ExitSignal = signum;
+}

@@ -1,6 +1,12 @@
-[submodule "libs/gb-test-roms"]
-	path = libs/gb-test-roms
+[submodule "emu/libs/spdlog"]
+	path = emu/libs/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "roms/gb-test-roms"]
+	path = roms/gb-test-roms
 	url = https://github.com/retrio/gb-test-roms.git
-[submodule "libs/sfml"]
-	path = libs/sfml
+[submodule "emu/libs/sfml"]
+	path = emu/libs/sfml
 	url = https://github.com/SFML/SFML.git
+[submodule "emu/libs/argparse"]
+	path = emu/libs/argparse
+	url = https://github.com/p-ranav/argparse.git

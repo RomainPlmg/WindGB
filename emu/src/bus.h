@@ -1,11 +1,12 @@
-#ifndef __RAM_H__
-#define __RAM_H__
+#pragma once
 
-#include <array>
-#include <cstdint>
-#include <vector>
+#include <memory>
 
-//
+#include "cartridge.h"
+#include "common.h"
+#include "io_reg.h"
+#include "ram.h"
+
 //      +------------+------------+-------------+--------------------------------+
 //      |  Start     | End        | Size        | Description                   |
 //      +------------+------------+-------------+--------------------------------+
@@ -22,22 +23,21 @@
 //      | 0xFF80     | 0xFFFE     | 127 B       | HRAM (Quick memory)           |
 //      | 0xFFFF     | 0xFFFF     | 1 B         | IE (Interrupt Enable)         |
 //      +------------+------------+-------------+--------------------------------+
-//
 
-class Memory {
+constexpr u16 INTERRUPT_ENABLE_ADDR = 0xFFFF;
+
+class Bus {
    public:
-    Memory();
-    uint8_t Read(uint16_t addr) const;
-    void Write(uint16_t addr, uint8_t data);
-
-    void LoadROM(const std::vector<uint8_t>& rom);
-
-    /* Getters */
-    uint8_t GetIE() const { return m_Memory[0xFFFF]; }
-    uint8_t GetIF() const { return m_Memory[0xFF0F]; }
+    Bus(Cartridge* cartridge);
+    u8 Read(u16 address) const;
+    void Write(u16 address, u8 data);
 
    private:
-    std::array<uint8_t, 65536> m_Memory;
-};
+    Cartridge* m_Cartridge;
+    std::unique_ptr<VRAM> m_VRAM;
+    std::unique_ptr<WRAM> m_WRAM;
+    std::unique_ptr<HRAM> m_HRAM;
+    std::unique_ptr<IO> m_IOREG;
 
-#endif  // __RAM_H__
+    u8 m_IE;
+};
