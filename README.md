@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/WindGB_logo.png" alt="WindGB Logo" width="256" style="image-rendering: pixelated;" />
+  <img src="assets/WindGB_logo.png" alt="WindGB Logo"/>
 </p>
 
 # 🕹️ WindGB - GameBoy Emulator
