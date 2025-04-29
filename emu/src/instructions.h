@@ -1512,7 +1512,7 @@ static void In_SBC_A_pHL(CPU& cpu, Bus& memBus) {  // SBC A, [HL]
     reg->SetFlag(Registers::Flag::Z, reg->A == 0);
     reg->SetFlag(Registers::Flag::N, true);
     reg->SetFlag(Registers::Flag::H, ((regA ^ value ^ result) & 0x10) != 0);
-    reg->SetFlag(Registers::Flag::C, carry != 0);
+    reg->SetFlag(Registers::Flag::C, regA < value + carry);
 
     cpu.AddCycles(2);
 }
@@ -2398,7 +2398,7 @@ static void In_LD_A_pn16(CPU& cpu, Bus& memBus) {  // LD A, [n16]
     u8 value = memBus.Read(addr);
     reg->A = value;
 
-    cpu.AddCycles(3);
+    cpu.AddCycles(4);
 }
 
 /** ADD SP,e8 ********************************************************************************************************/
@@ -3393,7 +3393,7 @@ static void In_BIT_0_B(CPU& cpu, Bus& memBus) {
     bool result = reg->B & (1 << 0);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3404,7 +3404,7 @@ static void In_BIT_0_C(CPU& cpu, Bus& memBus) {
     bool result = reg->C & (1 << 0);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3415,7 +3415,7 @@ static void In_BIT_0_D(CPU& cpu, Bus& memBus) {
     bool result = reg->D & (1 << 0);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3426,7 +3426,7 @@ static void In_BIT_0_E(CPU& cpu, Bus& memBus) {
     bool result = reg->E & (1 << 0);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3437,7 +3437,7 @@ static void In_BIT_0_H(CPU& cpu, Bus& memBus) {
     bool result = reg->H & (1 << 0);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3448,7 +3448,7 @@ static void In_BIT_0_L(CPU& cpu, Bus& memBus) {
     bool result = reg->L & (1 << 0);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3460,7 +3460,7 @@ static void In_BIT_0_pHL(CPU& cpu, Bus& memBus) {
     bool result = target & (1 << 0);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3471,7 +3471,7 @@ static void In_BIT_0_A(CPU& cpu, Bus& memBus) {
     bool result = reg->A & (1 << 0);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3483,7 +3483,7 @@ static void In_BIT_1_B(CPU& cpu, Bus& memBus) {
     bool result = reg->B & (1 << 1);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3494,7 +3494,7 @@ static void In_BIT_1_C(CPU& cpu, Bus& memBus) {
     bool result = reg->C & (1 << 1);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3505,7 +3505,7 @@ static void In_BIT_1_D(CPU& cpu, Bus& memBus) {
     bool result = reg->D & (1 << 1);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3516,7 +3516,7 @@ static void In_BIT_1_E(CPU& cpu, Bus& memBus) {
     bool result = reg->E & (1 << 1);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3527,7 +3527,7 @@ static void In_BIT_1_H(CPU& cpu, Bus& memBus) {
     bool result = reg->H & (1 << 1);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3538,7 +3538,7 @@ static void In_BIT_1_L(CPU& cpu, Bus& memBus) {
     bool result = reg->L & (1 << 1);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3550,7 +3550,7 @@ static void In_BIT_1_pHL(CPU& cpu, Bus& memBus) {
     bool result = target & (1 << 1);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3561,7 +3561,7 @@ static void In_BIT_1_A(CPU& cpu, Bus& memBus) {
     bool result = reg->A & (1 << 1);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3573,7 +3573,7 @@ static void In_BIT_2_B(CPU& cpu, Bus& memBus) {
     bool result = reg->B & (1 << 2);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3584,7 +3584,7 @@ static void In_BIT_2_C(CPU& cpu, Bus& memBus) {
     bool result = reg->C & (1 << 2);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3595,7 +3595,7 @@ static void In_BIT_2_D(CPU& cpu, Bus& memBus) {
     bool result = reg->D & (1 << 2);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3606,7 +3606,7 @@ static void In_BIT_2_E(CPU& cpu, Bus& memBus) {
     bool result = reg->E & (1 << 2);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3617,7 +3617,7 @@ static void In_BIT_2_H(CPU& cpu, Bus& memBus) {
     bool result = reg->H & (1 << 2);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3628,7 +3628,7 @@ static void In_BIT_2_L(CPU& cpu, Bus& memBus) {
     bool result = reg->L & (1 << 2);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3640,7 +3640,7 @@ static void In_BIT_2_pHL(CPU& cpu, Bus& memBus) {
     bool result = target & (1 << 2);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3651,7 +3651,7 @@ static void In_BIT_2_A(CPU& cpu, Bus& memBus) {
     bool result = reg->A & (1 << 2);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3663,7 +3663,7 @@ static void In_BIT_3_B(CPU& cpu, Bus& memBus) {
     bool result = reg->B & (1 << 3);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3674,7 +3674,7 @@ static void In_BIT_3_C(CPU& cpu, Bus& memBus) {
     bool result = reg->C & (1 << 3);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3685,7 +3685,7 @@ static void In_BIT_3_D(CPU& cpu, Bus& memBus) {
     bool result = reg->D & (1 << 3);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3696,7 +3696,7 @@ static void In_BIT_3_E(CPU& cpu, Bus& memBus) {
     bool result = reg->E & (1 << 3);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3707,7 +3707,7 @@ static void In_BIT_3_H(CPU& cpu, Bus& memBus) {
     bool result = reg->H & (1 << 3);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3718,7 +3718,7 @@ static void In_BIT_3_L(CPU& cpu, Bus& memBus) {
     bool result = reg->L & (1 << 3);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3730,7 +3730,7 @@ static void In_BIT_3_pHL(CPU& cpu, Bus& memBus) {
     bool result = target & (1 << 3);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3741,7 +3741,7 @@ static void In_BIT_3_A(CPU& cpu, Bus& memBus) {
     bool result = reg->A & (1 << 3);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3753,7 +3753,7 @@ static void In_BIT_4_B(CPU& cpu, Bus& memBus) {
     bool result = reg->B & (1 << 4);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3764,7 +3764,7 @@ static void In_BIT_4_C(CPU& cpu, Bus& memBus) {
     bool result = reg->C & (1 << 4);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3775,7 +3775,7 @@ static void In_BIT_4_D(CPU& cpu, Bus& memBus) {
     bool result = reg->D & (1 << 4);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3786,7 +3786,7 @@ static void In_BIT_4_E(CPU& cpu, Bus& memBus) {
     bool result = reg->E & (1 << 4);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3797,7 +3797,7 @@ static void In_BIT_4_H(CPU& cpu, Bus& memBus) {
     bool result = reg->H & (1 << 4);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3808,7 +3808,7 @@ static void In_BIT_4_L(CPU& cpu, Bus& memBus) {
     bool result = reg->L & (1 << 4);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3820,7 +3820,7 @@ static void In_BIT_4_pHL(CPU& cpu, Bus& memBus) {
     bool result = target & (1 << 4);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3831,7 +3831,7 @@ static void In_BIT_4_A(CPU& cpu, Bus& memBus) {
     bool result = reg->A & (1 << 4);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3843,7 +3843,7 @@ static void In_BIT_5_B(CPU& cpu, Bus& memBus) {
     bool result = reg->B & (1 << 5);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3854,7 +3854,7 @@ static void In_BIT_5_C(CPU& cpu, Bus& memBus) {
     bool result = reg->C & (1 << 5);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3865,7 +3865,7 @@ static void In_BIT_5_D(CPU& cpu, Bus& memBus) {
     bool result = reg->D & (1 << 5);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3876,7 +3876,7 @@ static void In_BIT_5_E(CPU& cpu, Bus& memBus) {
     bool result = reg->E & (1 << 5);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3887,7 +3887,7 @@ static void In_BIT_5_H(CPU& cpu, Bus& memBus) {
     bool result = reg->H & (1 << 5);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3898,7 +3898,7 @@ static void In_BIT_5_L(CPU& cpu, Bus& memBus) {
     bool result = reg->L & (1 << 5);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3910,7 +3910,7 @@ static void In_BIT_5_pHL(CPU& cpu, Bus& memBus) {
     bool result = target & (1 << 5);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3921,7 +3921,7 @@ static void In_BIT_5_A(CPU& cpu, Bus& memBus) {
     bool result = reg->A & (1 << 5);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3933,7 +3933,7 @@ static void In_BIT_6_B(CPU& cpu, Bus& memBus) {
     bool result = reg->B & (1 << 6);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3944,7 +3944,7 @@ static void In_BIT_6_C(CPU& cpu, Bus& memBus) {
     bool result = reg->C & (1 << 6);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3955,7 +3955,7 @@ static void In_BIT_6_D(CPU& cpu, Bus& memBus) {
     bool result = reg->D & (1 << 6);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3966,7 +3966,7 @@ static void In_BIT_6_E(CPU& cpu, Bus& memBus) {
     bool result = reg->E & (1 << 6);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3977,7 +3977,7 @@ static void In_BIT_6_H(CPU& cpu, Bus& memBus) {
     bool result = reg->H & (1 << 6);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -3988,7 +3988,7 @@ static void In_BIT_6_L(CPU& cpu, Bus& memBus) {
     bool result = reg->L & (1 << 6);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -4000,7 +4000,7 @@ static void In_BIT_6_pHL(CPU& cpu, Bus& memBus) {
     bool result = target & (1 << 6);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -4011,7 +4011,7 @@ static void In_BIT_6_A(CPU& cpu, Bus& memBus) {
     bool result = reg->A & (1 << 6);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -4023,7 +4023,7 @@ static void In_BIT_7_B(CPU& cpu, Bus& memBus) {
     bool result = reg->B & (1 << 7);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -4034,7 +4034,7 @@ static void In_BIT_7_C(CPU& cpu, Bus& memBus) {
     bool result = reg->C & (1 << 7);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -4045,7 +4045,7 @@ static void In_BIT_7_D(CPU& cpu, Bus& memBus) {
     bool result = reg->D & (1 << 7);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -4056,7 +4056,7 @@ static void In_BIT_7_E(CPU& cpu, Bus& memBus) {
     bool result = reg->E & (1 << 7);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -4067,7 +4067,7 @@ static void In_BIT_7_H(CPU& cpu, Bus& memBus) {
     bool result = reg->H & (1 << 7);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -4078,7 +4078,7 @@ static void In_BIT_7_L(CPU& cpu, Bus& memBus) {
     bool result = reg->L & (1 << 7);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -4090,7 +4090,7 @@ static void In_BIT_7_pHL(CPU& cpu, Bus& memBus) {
     bool result = target & (1 << 7);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 
@@ -4101,7 +4101,7 @@ static void In_BIT_7_A(CPU& cpu, Bus& memBus) {
     bool result = reg->A & (1 << 7);
 
     // Flags
-    reg->SetFlag(Registers::Flag::Z, result);
+    reg->SetFlag(Registers::Flag::Z, !result);
     reg->SetFlag(Registers::Flag::N, false);
     reg->SetFlag(Registers::Flag::H, true);
 

@@ -13,7 +13,7 @@
 std::atomic<bool> g_ExitRequested = false;
 std::atomic<int> g_ExitSignal{0};
 
-Gameboy::Gameboy(int argc, char const *argv[]) {
+Gameboy::Gameboy(int argc, char const* argv[]) {
     std::string romPath = {};
     std::string outputFile = {};
     bool debug = false;
@@ -22,9 +22,19 @@ Gameboy::Gameboy(int argc, char const *argv[]) {
     argparse::ArgumentParser parser("WindGB", "0.1.0");
     parser.add_argument("rom_path").help("Path to the ROM to load into the emulator.").store_into(romPath);
     parser.add_argument("-d", "--debug").default_value(false).implicit_value(true).help("Enable standard logging").store_into(debug);
-    parser.add_argument("--gameboy_doctor").default_value(false).implicit_value(true).help("Enable logging for Gameboy Doctor tests. (Disable the standard logging)").store_into(gbd);
+    parser.add_argument("--gameboy_doctor")
+        .default_value(false)
+        .implicit_value(true)
+        .help("Enable logging for Gameboy Doctor tests. (Disable the standard logging)")
+        .store_into(gbd);
     parser.add_argument("-o", "--output").help("Log output file.").store_into(outputFile);
-    parser.parse_args(argc, argv);
+    try {
+        parser.parse_args(argc, argv);
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        std::cerr << parser;
+        exit(EXIT_INVALID_ARGS);
+    }
 
     Log::Init(outputFile);
     Log::InitDoctor(outputFile);
