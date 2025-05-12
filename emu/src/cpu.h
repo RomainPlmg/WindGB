@@ -4,6 +4,7 @@
 
 #include "bus.h"
 #include "common.h"
+#include "interrupt.h"
 #include "registers.h"
 
 class CPU {
@@ -21,21 +22,21 @@ class CPU {
 
     /* Getters */
     Registers* GetRegisters() { return m_Registers.get(); }
-    bool GetIME() const { return m_IME; }
+    InterruptHandler* GetInterrupHandler() { return m_Interrupt.get(); }
     u32 GetCycles() const { return m_Cycles; }
+    u16 GetInterrupVector(u8 id); // Return the address of the interrupt handler corresponding to the ID
 
     /* Setters */
-    void SetIME(bool ime) { m_IME = ime; }
     void SetCycles(u32 cycles) { m_Cycles = cycles; }
     void RequestIMEEnable() { m_EnableIMEAfterInstruction = true; }
 
    private:
-    bool m_IME;
     bool m_EnableIMEAfterInstruction;
     bool m_Halted;
     u32 m_Cycles;
     std::unique_ptr<Registers> m_Registers;
     Bus& m_Bus;
+    std::unique_ptr<InterruptHandler> m_Interrupt;
 
     void HandleInterrupts();
 };

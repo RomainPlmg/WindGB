@@ -7,7 +7,10 @@
 #include "log.h"
 #include "registers.h"
 
-CPU::CPU(Bus& memBus) : m_Bus(memBus) { m_Registers = std::make_unique<Registers>(); }
+CPU::CPU(Bus& memBus) : m_Bus(memBus) {
+    m_Registers = std::make_unique<Registers>();
+    m_Interrupt = std::make_unique<InterruptHandler>(memBus);
+}
 
 void CPU::Reset() {  // Init registers
     // LOG_INFO("Reset CPU");
@@ -23,14 +26,14 @@ void CPU::Reset() {  // Init registers
     m_Registers->PC = 0x0100;  // Jump to the game entry point
 
     m_Cycles = 0;
-    m_IME = false;
+    m_Interrupt->SetIME(false);
     m_EnableIMEAfterInstruction = false;
     m_Halted = false;
 }
 
 void CPU::Step() {
     if (!m_Halted) {
-        if (m_IME && (m_Bus.Read(IO_REG_INTERRUPT_FLAGS) & m_Bus.Read(INTERRUPT_ENABLE_ADDR))) {
+        if (m_Interrupt->GetIME() && (m_Bus.Read(IO_REG_INTERRUPT_FLAGS) & m_Bus.Read(INTERRUPT_ENABLE_ADDR))) {
             LOG_INFO("Interrupt !!!");
         }
 
@@ -45,14 +48,14 @@ void CPU::Step() {
 
         LOG_DEBUG("Executing instruction '{}'\tPC = 0x{:02X}", curInst.name, m_Registers->PC);
         GBD_LOG_DEBUG("A:{:02x} F:{:02x} B:{:02x} C:{:02x} D:{:02x} E:{:02x} H:{:02x} L:{:02x} SP:{:04x} PC:{:04x} PCMEM:{:02x},{:02x},{:02x},{:02x}",
-                  m_Registers->A, m_Registers->F, m_Registers->B, m_Registers->C, m_Registers->D, m_Registers->E, m_Registers->H, m_Registers->L,
-                  m_Registers->SP, debugPC, m_Bus.Read(debugPC), m_Bus.Read(debugPC + 1), m_Bus.Read(debugPC + 2), m_Bus.Read(debugPC + 3));
+                      m_Registers->A, m_Registers->F, m_Registers->B, m_Registers->C, m_Registers->D, m_Registers->E, m_Registers->H, m_Registers->L,
+                      m_Registers->SP, debugPC, m_Bus.Read(debugPC), m_Bus.Read(debugPC + 1), m_Bus.Read(debugPC + 2), m_Bus.Read(debugPC + 3));
 
         curInst.Execute(*this, m_Bus);
 
         // For EI instruction, enable interrupt flag after the instruction was executed
         if (m_EnableIMEAfterInstruction) {
-            SetIME(true);
+            m_Interrupt->SetIME(true);
             m_EnableIMEAfterInstruction = false;
         }
     }
@@ -77,6 +80,24 @@ u16 CPU::Pop16Stack() {
     u8 high = m_Bus.Read(m_Registers->SP++);
 
     return (high << 8) | low;
+}
+
+u16 CPU::GetInterrupVector(u8 id) {
+    switch (id) {
+        case 0:
+            return 0x0040;  // V-Blank
+        case 1:
+            return 0x0048;  // LCD STAT
+        case 2:
+            return 0x0050;  // Timer
+        case 3:
+            return 0x0058;  // Serial
+        case 4:
+            return 0x0060;  // Joypad
+        default:
+            LOG_ERROR("{} is an invalid interrupt ID", id);
+            return 0x0000;  // Should never happen
+    }
 }
 
 void CPU::Push8Stack(u8 value) { m_Bus.Write(--m_Registers->SP, value); }

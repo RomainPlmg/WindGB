@@ -996,9 +996,6 @@ static void In_LD_pHL_L(CPU& cpu, Bus& memBus) {  // LD [HL], L
 
 /** HALT ************************************************************************************************************/
 static void In_HALT(CPU& cpu, Bus& memBus) {  // HALT
-    if (cpu.GetIME()) {
-    } else {
-    }
 }  // TODO
 
 /** ADD A,r8 ********************************************************************************************************/
@@ -2108,7 +2105,7 @@ static void In_RET(CPU& cpu, Bus& memBus) {  // RET
 static void In_RETI(CPU& cpu, Bus& memBus) {  // RETI
     Registers* reg = cpu.GetRegisters();
     reg->PC = cpu.Pop16Stack();
-    cpu.SetIME(true);
+    cpu.GetInterrupHandler()->SetIME(true);
     cpu.AddCycles(4);
 }
 
@@ -2446,7 +2443,7 @@ static void In_LD_SP_HL(CPU& cpu, Bus& memBus) {  // LD SP, HL
 
 /** DI ***************************************************************************************************************/
 static void In_DI(CPU& cpu, Bus& memBus) {  // DI
-    cpu.SetIME(false);
+    cpu.GetInterrupHandler()->SetIME(false);
     cpu.AddCycles(1);
 }
 
