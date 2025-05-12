@@ -12,6 +12,9 @@ u8 WRAM::Read(u16 addr) const {
 }
 
 void WRAM::Write(u16 addr, u8 data) {
+    if (addr == 0xDEF6) {
+        LOG_INFO("Write {:02X} at 0xDEF6", data);
+    }
     u16 relativeAddr = addr - WRAM_ADDR_START;
     if (relativeAddr >= WRAM_ADDR_SIZE) {
         LOG_ERROR("Address addr 0x{:02X} is out of WRAM range 0x{:02X}<->0x{:02X}", addr, WRAM_ADDR_START, WRAM_ADDR_START + WRAM_ADDR_SIZE - 1);
@@ -50,9 +53,9 @@ u8 VRAM::Read(u16 addr) const {
 }
 
 void VRAM::Write(u16 addr, u8 data) {
-    u16 relativeAddr = addr - HRAM_ADDR_START;
-    if (relativeAddr >= HRAM_ADDR_SIZE) {
-        LOG_ERROR("Address addr 0x{:02X} is out of WRAM range 0x{:02X}<->0x{:02X}", addr, HRAM_ADDR_START, HRAM_ADDR_START + HRAM_ADDR_SIZE - 1);
+    u16 relativeAddr = addr - VRAM_ADDR_START;
+    if (relativeAddr >= VRAM_ADDR_SIZE) {
+        LOG_ERROR("Address addr 0x{:02X} is out of WRAM range 0x{:02X}<->0x{:02X}", addr, VRAM_ADDR_START, VRAM_ADDR_START + VRAM_ADDR_SIZE - 1);
         return;
     }
 

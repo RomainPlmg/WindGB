@@ -8,7 +8,7 @@ constexpr u16 WRAM_ADDR_START = 0xC000;
 constexpr u16 WRAM_ADDR_SIZE = 0x2000;
 
 constexpr u16 WRAM_ECHO_ADDR_START = 0xE000;
-constexpr u16 WRAM_ECHO_ADDR_SIZE = 0x2000;
+constexpr u16 WRAM_ECHO_ADDR_SIZE = 0x1E00;
 
 constexpr u16 HRAM_ADDR_START = 0xFF80;
 constexpr u16 HRAM_ADDR_SIZE = 0x007F;
@@ -22,7 +22,7 @@ class WRAM {
     void Write(u16 addr, u8 data);
 
    private:
-    std::array<u8, WRAM_ADDR_SIZE> m_Data;
+    std::array<u8, WRAM_ADDR_SIZE> m_Data = {0};
 };
 
 class HRAM {
@@ -31,7 +31,7 @@ class HRAM {
     void Write(u16 addr, u8 data);
 
    private:
-    std::array<u8, HRAM_ADDR_SIZE> m_Data;
+    std::array<u8, HRAM_ADDR_SIZE> m_Data = {0};
 };
 
 class VRAM {
@@ -40,5 +40,5 @@ class VRAM {
     void Write(u16 addr, u8 data);
 
    private:
-    std::array<u8, VRAM_ADDR_SIZE> m_Data;
+    std::array<u8, VRAM_ADDR_SIZE> m_Data = {0};
 };
