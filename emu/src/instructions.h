@@ -996,6 +996,7 @@ static void In_LD_pHL_L(CPU& cpu, Bus& memBus) {  // LD [HL], L
 
 /** HALT ************************************************************************************************************/
 static void In_HALT(CPU& cpu, Bus& memBus) {  // HALT
+    cpu.Halt();
 }  // TODO
 
 /** ADD A,r8 ********************************************************************************************************/
@@ -1281,7 +1282,7 @@ static void In_SUB_A_B(CPU& cpu, Bus& memBus) {  // SUB A, B
     reg->SetFlag(Registers::Flag::Z, reg->A == 0);
     reg->SetFlag(Registers::Flag::N, true);
     reg->SetFlag(Registers::Flag::H, (regA & 0x0F) < (reg->B & 0x0F));
-    reg->SetFlag(Registers::Flag::C, result > 0xFF);
+    reg->SetFlag(Registers::Flag::C, regA < reg->B);
 
     cpu.AddCycles(1);
 }
@@ -1296,7 +1297,7 @@ static void In_SUB_A_C(CPU& cpu, Bus& memBus) {  // SUB A, C
     reg->SetFlag(Registers::Flag::Z, reg->A == 0);
     reg->SetFlag(Registers::Flag::N, true);
     reg->SetFlag(Registers::Flag::H, (regA & 0x0F) < (reg->C & 0x0F));
-    reg->SetFlag(Registers::Flag::C, result > 0xFF);
+    reg->SetFlag(Registers::Flag::C, regA < reg->C);
 
     cpu.AddCycles(1);
 }
@@ -1311,7 +1312,7 @@ static void In_SUB_A_D(CPU& cpu, Bus& memBus) {  // SUB A, D
     reg->SetFlag(Registers::Flag::Z, reg->A == 0);
     reg->SetFlag(Registers::Flag::N, true);
     reg->SetFlag(Registers::Flag::H, (regA & 0x0F) < (reg->D & 0x0F));
-    reg->SetFlag(Registers::Flag::C, result > 0xFF);
+    reg->SetFlag(Registers::Flag::C, regA < reg->D);
 
     cpu.AddCycles(1);
 }
@@ -1326,7 +1327,7 @@ static void In_SUB_A_E(CPU& cpu, Bus& memBus) {  // SUB A, E
     reg->SetFlag(Registers::Flag::Z, reg->A == 0);
     reg->SetFlag(Registers::Flag::N, true);
     reg->SetFlag(Registers::Flag::H, (regA & 0x0F) < (reg->E & 0x0F));
-    reg->SetFlag(Registers::Flag::C, result > 0xFF);
+    reg->SetFlag(Registers::Flag::C, regA < reg->E);
 
     cpu.AddCycles(1);
 }
@@ -1341,7 +1342,7 @@ static void In_SUB_A_H(CPU& cpu, Bus& memBus) {  // SUB A, H
     reg->SetFlag(Registers::Flag::Z, reg->A == 0);
     reg->SetFlag(Registers::Flag::N, true);
     reg->SetFlag(Registers::Flag::H, (regA & 0x0F) < (reg->H & 0x0F));
-    reg->SetFlag(Registers::Flag::C, result > 0xFF);
+    reg->SetFlag(Registers::Flag::C, regA < reg->H);
 
     cpu.AddCycles(1);
 }
@@ -1356,7 +1357,7 @@ static void In_SUB_A_L(CPU& cpu, Bus& memBus) {  // SUB A, L
     reg->SetFlag(Registers::Flag::Z, reg->A == 0);
     reg->SetFlag(Registers::Flag::N, true);
     reg->SetFlag(Registers::Flag::H, (regA & 0x0F) < (reg->L & 0x0F));
-    reg->SetFlag(Registers::Flag::C, result > 0xFF);
+    reg->SetFlag(Registers::Flag::C, regA < reg->L);
 
     cpu.AddCycles(1);
 }
@@ -1374,7 +1375,7 @@ static void In_SUB_A_pHL(CPU& cpu, Bus& memBus) {  // SUB A, [HL]
     reg->SetFlag(Registers::Flag::Z, reg->A == 0);
     reg->SetFlag(Registers::Flag::N, true);
     reg->SetFlag(Registers::Flag::H, (regA & 0x0F) < (value & 0x0F));
-    reg->SetFlag(Registers::Flag::C, result > 0xFF);
+    reg->SetFlag(Registers::Flag::C, regA < value);
 
     cpu.AddCycles(2);
 }

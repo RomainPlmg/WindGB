@@ -24,14 +24,15 @@ class CPU {
     Registers* GetRegisters() { return m_Registers.get(); }
     InterruptHandler* GetInterrupHandler() { return m_Interrupt.get(); }
     u32 GetCycles() const { return m_Cycles; }
-    u16 GetInterrupVector(u8 id); // Return the address of the interrupt handler corresponding to the ID
+    u16 GetInterrupVector(u8 id);  // Return the address of the interrupt handler corresponding to the ID
 
     /* Setters */
     void SetCycles(u32 cycles) { m_Cycles = cycles; }
-    void RequestIMEEnable() { m_EnableIMEAfterInstruction = true; }
+    void RequestIMEEnable() { m_EnableIMECountdown = 2; }
+    void Halt() { m_Halted = true; }
 
    private:
-    bool m_EnableIMEAfterInstruction;
+    int m_EnableIMECountdown;
     bool m_Halted;
     u32 m_Cycles;
     std::unique_ptr<Registers> m_Registers;
