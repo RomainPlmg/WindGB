@@ -18,10 +18,12 @@ Gameboy::Gameboy(int argc, char const* argv[]) {
     std::string outputFile = {};
     bool debug = false;
     bool gbd = false;
+    bool header = false;
 
     argparse::ArgumentParser parser("WindGB", "0.1.0");
     parser.add_argument("rom_path").help("Path to the ROM to load into the emulator.").store_into(romPath);
     parser.add_argument("-d", "--debug").default_value(false).implicit_value(true).help("Enable standard logging").store_into(debug);
+    parser.add_argument("--header").default_value(false).implicit_value(true).help("Only print the header of the ROM").store_into(header);
     parser.add_argument("--gameboy_doctor")
         .default_value(false)
         .implicit_value(true)
@@ -41,7 +43,7 @@ Gameboy::Gameboy(int argc, char const* argv[]) {
 
     if (gbd) {
         Log::Disable();
-    } else if (debug) {
+    } else if (debug || header) {
         Log::DisableDoctor();
     } else {
         Log::Disable();
@@ -58,6 +60,7 @@ Gameboy::Gameboy(int argc, char const* argv[]) {
     }
 
     m_Cartridge->Load(romPath);
+    if (header) exit(EXIT_OK);
 }
 
 void Gameboy::Run() {
