@@ -14,43 +14,68 @@ u8 Bus::Read(u16 address) const {
         return 0x90;
     }
 
-    if (address < VRAM_ADDR_START) {
-        return m_Cartridge->Read(address);  // ROM data
-    } else if (address < 0xA000) {
+    if (address < VRAM_ADDR_START) {  // ROM data
+        return m_Cartridge->Read(address);
+    }
+
+    if (address >= VRAM_ADDR_START && address < 0xA000) {  // VRAM data
         return m_VRAM->Read(address);
-    } else if (address >= WRAM_ADDR_START && address < WRAM_ECHO_ADDR_START) {
+    }
+
+    if (address >= WRAM_ADDR_START && address < WRAM_ECHO_ADDR_START) {  // WRAM data
         return m_WRAM->Read(address);
-    } else if (address >= WRAM_ECHO_ADDR_START && address < 0xFE00) {
+    }
+
+    if (address >= WRAM_ECHO_ADDR_START && address < 0xFE00) {  // WRAM echo data
         return m_WRAM->Read(address - WRAM_ADDR_SIZE);
-    } else if (address >= 0xFF00 && address < 0xFF80) {
+    }
+
+    if (address >= IO_REG_START && address < HRAM_ADDR_START) {  // IOREG data
         return m_IOREG->Read(address);
-    } else if (address < INTERRUPT_ENABLE_ADDR) {
+    }
+
+    if (address >= HRAM_ADDR_START && address < INTERRUPT_ENABLE_ADDR) {  // HRAM data
         return m_HRAM->Read(address);
-    } else if (address == INTERRUPT_ENABLE_ADDR) {
+    }
+
+    if (address == INTERRUPT_ENABLE_ADDR) {  // IE data
         return m_IE;
     }
 
-    LOG_ERROR("Invalid address on bus for read operation. Addr = 0x{:02X}", address);
+    LOG_ERROR("Invalid address on bus for read operation. Addr = 0x{:04X}", address);
     return 0;
 }
 
 void Bus::Write(u16 address, u8 data) {
-    if (address < VRAM_ADDR_START) {
-        // LOG_ERROR("The address 0x{:02X} belongs to the cartridge's ROM, you cannot write inside it.", address);
+    if (address < VRAM_ADDR_START) {  // ROM data
         return m_Cartridge->Write(address, data);
-    } else if (address < 0xA000) {
+    }
+
+    if (address >= VRAM_ADDR_START && address < 0xA000) {  // VRAM data
         return m_VRAM->Write(address, data);
-    } else if (address >= WRAM_ADDR_START && address < WRAM_ECHO_ADDR_START) {
+    }
+
+    if (address >= WRAM_ADDR_START && address < WRAM_ECHO_ADDR_START) {  // WRAM data
         return m_WRAM->Write(address, data);
-    } else if (address >= IO_REG_START && address < HRAM_ADDR_START) {
+    }
+
+    if (address >= WRAM_ECHO_ADDR_START && address < 0xFE00) {  // WRAM echo data
+        return m_WRAM->Write(address - WRAM_ADDR_SIZE, data);
+    }
+
+    if (address >= IO_REG_START && address < HRAM_ADDR_START) {  // IOREG data
         return m_IOREG->Write(address, data);
-    } else if (address < INTERRUPT_ENABLE_ADDR) {
+    }
+
+    if (address >= HRAM_ADDR_START && address < INTERRUPT_ENABLE_ADDR) {  // HRAM data
         return m_HRAM->Write(address, data);
-    } else if (address == INTERRUPT_ENABLE_ADDR) {
+    }
+
+    if (address == INTERRUPT_ENABLE_ADDR) {  // IE data
         m_IE = data;
         return;
     }
 
-    LOG_ERROR("Invalid address on bus for write operation. Addr = 0x{:02X} | Data = 0x{:01X}", address, data);
+    LOG_ERROR("Invalid address on bus for write operation. Addr = 0x{:04X} | Data = 0x{:01X}", address, data);
     return;
 }
