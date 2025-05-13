@@ -1,6 +1,6 @@
 #pragma once
 
-#include <array>
+#include <vector>
 #include <string>
 
 #include "common.h"
@@ -29,8 +29,8 @@ struct CartridgeHeader {
 
 struct CartridgeContext {
     std::string filename;
-    u32 rom_size;
-    std::array<u8, CARTRIDGE_SIZE> rom_data;
+    u32 rom_size = 0;
+    std::vector<u8> rom_data;
     CartridgeHeader* header;
 };
 

@@ -105,10 +105,11 @@ void Cartridge::Load(const std::string& path) {
 
     // Read file into the memory
     char byte;
-    size_t i = 0;
     while (file.read(&byte, 1)) {
-        m_Context.rom_data[i++] = static_cast<uint8_t>(byte);
+        m_Context.rom_data.push_back(static_cast<u8>(byte));
     }
+
+    m_Context.rom_size = m_Context.rom_data.size();
 
     if (!file.eof()) {
         LOG_CRITICAL("ROM read failed");
@@ -120,7 +121,7 @@ void Cartridge::Load(const std::string& path) {
     m_Context.header->title[15] = 0;  // Remove the \0 character
 
     // Checksum
-    uint8_t x = 0;
+    u8 x = 0;
     for (uint16_t address = 0x0134; address <= 0x014C; address++) {
         x = x - m_Context.rom_data[address] - 1;
     }
