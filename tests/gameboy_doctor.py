@@ -15,7 +15,7 @@ def extract_test_number(filename: str) -> int:
     return int(filename.split("-")[0])
 
 
-def run_test_on_rom(rom_path) -> tuple[str, bool]:
+def run_test_on_rom(rom_path: pathlib.Path, verbose: bool):
     test_num = extract_test_number(rom_path.name)
     name = rom_path.name
     try:
@@ -38,37 +38,65 @@ def run_test_on_rom(rom_path) -> tuple[str, bool]:
         except subprocess.TimeoutExpired:
             windgb_proc.kill()
 
-        return name, doctor_proc.returncode == 0
+        if doctor_proc.returncode == 0:
+            return rom_path.name, True, None
+        else:
+            log = ""
+            if verbose:
+                log += f"\n---- {rom_path.name} stdout ----\n{doctor_proc.stdout}"
+                if doctor_proc.stderr:
+                    log += f"\n---- {rom_path.name} stderr ----\n{doctor_proc.stderr}"
+            return rom_path.name, False, log
 
     except Exception as e:
-        return name, False
+        return rom_path.name, False, f"⚠️ Error running {rom_path.name}: {e}"
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run Blargg CPU tests through Gameboy Doctor.")
-    parser.add_argument("--only", nargs="+", help="Run specific test(s) by number (e.g. 03 07 11)")
+    parser = argparse.ArgumentParser(
+        description="Run Blargg CPU tests through Gameboy Doctor."
+    )
+    parser.add_argument(
+        "--only", nargs="+", help="Run specific test(s) by number (e.g. 03 07 11)"
+    )
+    parser.add_argument(
+        "--verbose", action="store_true", help="Show gameboy_doctor output on failure"
+    )
     args = parser.parse_args()
 
     rom_files = sorted(ROMS_DIR.glob("*.gb"))
 
     max_name_length = max(len(rom.name) for rom in rom_files)
 
-    
     if args.only:
-        rom_files = [f for f in rom_files if any(f.name.startswith(f"{nb}-") for nb in args.only)]
+        rom_files = [
+            f for f in rom_files if any(f.name.startswith(f"{nb}-") for nb in args.only)
+        ]
         if not rom_files:
             print(f"⚠️ No ROM found for test {args.only}")
             return
 
     results = []
+    logs = []
     with concurrent.futures.ThreadPoolExecutor() as executor:
         future_to_rom = {
-            executor.submit(run_test_on_rom, rom): rom for rom in rom_files
+            executor.submit(run_test_on_rom, rom, args.verbose): rom
+            for rom in rom_files
         }
+
         for future in concurrent.futures.as_completed(future_to_rom):
-            name, success = future.result()
-            print(f"{name.ljust(max_name_length)} --> {"✅ ​Pass" if success else "❌ ​Fail"}")
+            name, success, log = future.result()
+            print(
+                f"{name.ljust(max_name_length)} --> {"✅ ​Pass" if success else "❌ ​Fail"}"
+            )
             results.append(success)
+            if log:
+                logs.append(log)
+
+    if logs:
+        print("\nDetailed error output:\n")
+        for log in logs:
+            print(log)
 
     passed = sum(results)
     total = len(results)
