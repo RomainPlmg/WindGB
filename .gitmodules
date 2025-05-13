@@ -10,3 +10,6 @@
 [submodule "emu/libs/argparse"]
 	path = emu/libs/argparse
 	url = https://github.com/p-ranav/argparse.git
+[submodule "tests/tools/gameboy-doctor"]
+	path = tests/tools/gameboy-doctor
+	url = https://github.com/robert/gameboy-doctor.git
