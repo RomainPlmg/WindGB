@@ -14,6 +14,8 @@ std::atomic<bool> g_ExitRequested = false;
 std::atomic<int> g_ExitSignal{0};
 
 Gameboy::Gameboy(int argc, char const* argv[]) {
+    std::signal(SIGINT, signal_callback_handler);  // Register signal and signal handler
+
     std::string romPath = {};
     std::string outputFile = {};
     bool debug = false;
@@ -63,17 +65,21 @@ Gameboy::Gameboy(int argc, char const* argv[]) {
     if (header) exit(EXIT_OK);
 }
 
-void Gameboy::Run() {
-    std::signal(SIGINT, signal_callback_handler);  // Register signal and signal handler
-    m_CPU->Reset();                                // Reset the CPU at the initial state
+void Gameboy::Init() {
+    m_CPU->Reset();  // Reset the CPU at the initial state
+}
 
-    while (m_Running) {
-        if (g_ExitRequested) {
-            HandleAsyncExit();
-        }
-
-        m_CPU->Step();
+void Gameboy::Step() {
+    if (g_ExitRequested) {
+        HandleAsyncExit();
     }
+
+    m_CPU->Step();
+}
+
+std::string_view Gameboy::GetLoadedGame() const {
+    std::string_view title = m_Cartridge->GetContext().header->GetTitle();
+    return title;
 }
 
 void Gameboy::HandleAsyncExit() {
