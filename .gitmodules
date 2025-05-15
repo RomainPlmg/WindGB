@@ -1,15 +1,15 @@
 [submodule "emu/libs/spdlog"]
-	path = emu/libs/spdlog
+	path = libs/spdlog
 	url = https://github.com/gabime/spdlog.git
 [submodule "roms/gb-test-roms"]
-	path = roms/gb-test-roms
+	path = libs/gb-test-roms
 	url = https://github.com/retrio/gb-test-roms.git
 [submodule "emu/libs/sfml"]
-	path = emu/libs/sfml
+	path = libs/sfml
 	url = https://github.com/SFML/SFML.git
 [submodule "emu/libs/argparse"]
-	path = emu/libs/argparse
+	path = libs/argparse
 	url = https://github.com/p-ranav/argparse.git
 [submodule "tests/tools/gameboy-doctor"]
-	path = tests/tools/gameboy-doctor
+	path = libs/gameboy-doctor
 	url = https://github.com/robert/gameboy-doctor.git

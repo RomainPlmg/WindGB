@@ -7,8 +7,8 @@ import sys
 THIS_DIR = pathlib.Path(__file__).parent.resolve()
 PROJECT_ROOT = THIS_DIR.parent
 EMULATOR_PATH = PROJECT_ROOT / "build" / "Debug" / "app" / "emuapp.exe"
-ROMS_DIR = PROJECT_ROOT / "roms" / "gb-test-roms" / "cpu_instrs" / "individual"
-DOCTOR_PATH = PROJECT_ROOT / "tests" / "tools" / "gameboy-doctor" / "gameboy-doctor"
+ROMS_DIR = PROJECT_ROOT / "libs" / "gb-test-roms" / "cpu_instrs" / "individual"
+DOCTOR_PATH = PROJECT_ROOT / "libs" / "gameboy-doctor" / "gameboy-doctor"
 
 
 def extract_test_number(filename: str) -> int:
