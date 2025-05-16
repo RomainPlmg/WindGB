@@ -6,7 +6,9 @@ import sys
 
 THIS_DIR = pathlib.Path(__file__).parent.resolve()
 PROJECT_ROOT = THIS_DIR.parent
-EMULATOR_PATH = PROJECT_ROOT / "build" / "Debug" / "app" / "emuapp.exe"
+EMULATOR_PATH = PROJECT_ROOT / "build" / "Debug" / "app" / "emuapp"
+if sys.platform.startswith("win"):
+    EMULATOR_PATH = EMULATOR_PATH.with_suffix(".exe")
 ROMS_DIR = PROJECT_ROOT / "libs" / "gb-test-roms" / "cpu_instrs" / "individual"
 DOCTOR_PATH = PROJECT_ROOT / "libs" / "gameboy-doctor" / "gameboy-doctor"
 
