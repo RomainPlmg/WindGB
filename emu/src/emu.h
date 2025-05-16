@@ -12,7 +12,7 @@ struct GameboyContext {};
 
 class Gameboy {
    public:
-    Gameboy(int argc, char const *argv[]);
+    Gameboy(int argc, char const* argv[]);
     void Init();
     void Step();
 
@@ -21,6 +21,7 @@ class Gameboy {
     bool IsPaused() const { return m_Paused; }
     u32 GetTicks() const { return m_Ticks; }
     std::string_view GetLoadedGame() const;
+    Bus* GetBus() const { return m_Bus.get(); }
 
    private:
     bool m_Running;
