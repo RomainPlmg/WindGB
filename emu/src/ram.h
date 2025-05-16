@@ -19,6 +19,7 @@ constexpr u16 VRAM_ADDR_SIZE = 0x2000;
 class WRAM {
    public:
     u8 Read(u16 addr) const;
+    const u8* GetPointerTo(u16 address) const;
     void Write(u16 addr, u8 data);
 
    private:
@@ -28,6 +29,7 @@ class WRAM {
 class HRAM {
    public:
     u8 Read(u16 addr) const;
+    const u8* GetPointerTo(u16 address) const;
     void Write(u16 addr, u8 data);
 
    private:
@@ -37,6 +39,7 @@ class HRAM {
 class VRAM {
    public:
     u8 Read(u16 addr) const;
+    const u8* GetPointerTo(u16 address) const;
     void Write(u16 addr, u8 data);
 
    private:

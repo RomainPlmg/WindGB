@@ -136,12 +136,20 @@ void Cartridge::Load(const std::string& path) {
     LOG_INFO("\tChecksum: 0x{:02X} ({})", m_Context.header->checksum, (x & 0xFF) ? "PASSED" : "FAILED");
 }
 
-u8 Cartridge::Read(u16 addr) {
+u8 Cartridge::Read(u16 addr) const {
     if (addr >= CARTRIDGE_SIZE) {
         LOG_ERROR("Read cartridge out of address range 0x0000 - 0x{:04X}: 0x{:04X}", CARTRIDGE_SIZE - 1, addr);
         return 0;
     }
     return m_Context.rom_data.at(addr);
+}
+
+const u8* Cartridge::GetPointerTo(u16 addr) const {
+    if (addr >= CARTRIDGE_SIZE) {
+        LOG_ERROR("Read cartridge out of address range 0x0000 - 0x{:04X}: 0x{:04X}", CARTRIDGE_SIZE - 1, addr);
+        return 0;
+    }
+    return &m_Context.rom_data.at(addr);
 }
 
 void Cartridge::Write(u16 addr, u8 data) {

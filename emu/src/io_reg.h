@@ -24,6 +24,7 @@ constexpr u16 IO_REG_DISABLE_BOOT_ROM = 0xFF50;
 class IO {
    public:
     u8 Read(u16 addr) const;
+    const u8* GetPointerTo(u16 address) const;
     void Write(u16 addr, u8 data);
 
    private:

@@ -29,6 +29,7 @@ class Bus {
    public:
     Bus(Cartridge* cartridge);
     u8 Read(u16 address) const;
+    const u8* GetPointerTo(u16 address);
     void Write(u16 address, u8 data);
 
    private:

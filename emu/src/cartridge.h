@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "common.h"
 
@@ -38,7 +38,8 @@ class Cartridge {
    public:
     void Load(const std::string& path);
 
-    u8 Read(u16 addr);
+    u8 Read(u16 addr) const;
+    const u8* GetPointerTo(u16 address) const;
     void Write(u16 addr, u8 data);
 
     /* Getters */

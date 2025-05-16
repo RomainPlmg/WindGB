@@ -46,6 +46,39 @@ u8 Bus::Read(u16 address) const {
     return 0;
 }
 
+const u8* Bus::GetPointerTo(u16 address) {
+    if (address < VRAM_ADDR_START) {  // ROM data
+        return m_Cartridge->GetPointerTo(address);
+    }
+
+    if (address >= VRAM_ADDR_START && address < 0xA000) {  // VRAM data
+        return m_VRAM->GetPointerTo(address);
+    }
+
+    if (address >= WRAM_ADDR_START && address < WRAM_ECHO_ADDR_START) {  // WRAM data
+        return m_WRAM->GetPointerTo(address);
+    }
+
+    if (address >= WRAM_ECHO_ADDR_START && address < 0xFE00) {  // WRAM echo data
+        return m_WRAM->GetPointerTo(address - WRAM_ADDR_SIZE);
+    }
+
+    if (address >= IO_REG_START && address < HRAM_ADDR_START) {  // IOREG data
+        return m_IOREG->GetPointerTo(address);
+    }
+
+    if (address >= HRAM_ADDR_START && address < INTERRUPT_ENABLE_ADDR) {  // HRAM data
+        return m_HRAM->GetPointerTo(address);
+    }
+
+    if (address == INTERRUPT_ENABLE_ADDR) {  // IE data
+        return &m_IE;
+    }
+
+    LOG_ERROR("Invalid address on bus for read operation. Addr = 0x{:04X}", address);
+    return nullptr;
+}
+
 void Bus::Write(u16 address, u8 data) {
     if (address < VRAM_ADDR_START) {  // ROM data
         return m_Cartridge->Write(address, data);
