@@ -4,7 +4,7 @@
 
 #include "bus.h"
 #include "instructions.h"
-#include "log.h"
+#include "utils/log.h"
 #include "registers.h"
 
 CPU::CPU(Bus& memBus) : m_Bus(memBus) {

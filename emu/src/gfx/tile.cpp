@@ -1,5 +1,7 @@
 #include "tile.h"
 
+#include "utils/log.h"
+
 static constexpr std::array<std::array<u8, 4>, 4> GB_COLORS = {{
     {8, 24, 32, 255},      // colorID = 0
     {52, 104, 86, 255},    // colorID = 1
@@ -7,9 +9,17 @@ static constexpr std::array<std::array<u8, 4>, 4> GB_COLORS = {{
     {224, 248, 208, 255}   // colorID = 3
 }};
 
-Tile::Tile(const u8* baseAddr) : m_Data(baseAddr) {}
+Tile::Tile(Bus& memBus, u16 baseAddr) : m_Bus(memBus), m_BaseAddr(baseAddr) {}
 
-void Tile::Update() {
+const u8* Tile::GetData() const {
+    if (m_Data == nullptr) {
+        LOG_ERROR("Tile data is nullptr...");
+    }
+    return m_Data;
+}
+
+const u8* Tile::GetPixels() const {
+    std::array<u8, TILE_PIXEL_SIZE> pixels;
     for (u8 row = 0; row < TILE_WIDTH; row++) {
         u8 firstByte = *(m_Data + row * 2);
         u8 secondByte = *(m_Data + row * 2 + 1);
@@ -21,10 +31,12 @@ void Tile::Update() {
             u8 colorID = (hi << 1) | lo;
 
             const auto& color = GB_COLORS[colorID];
-            m_Pixels[pixelIndex + 0] = color[0];
-            m_Pixels[pixelIndex + 1] = color[1];
-            m_Pixels[pixelIndex + 2] = color[2];
-            m_Pixels[pixelIndex + 3] = color[3];
+            pixels[pixelIndex + 0] = color[0];
+            pixels[pixelIndex + 1] = color[1];
+            pixels[pixelIndex + 2] = color[2];
+            pixels[pixelIndex + 3] = color[3];
         }
     }
+
+    return pixels.data();
 }

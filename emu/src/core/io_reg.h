@@ -2,7 +2,7 @@
 
 #include <array>
 
-#include "common.h"
+#include "utils/common.h"
 
 constexpr u16 IO_REG_START = 0xFF00;
 constexpr u16 IO_REG_SIZE = 0x0080;

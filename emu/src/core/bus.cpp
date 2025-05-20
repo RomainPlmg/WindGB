@@ -1,6 +1,6 @@
 #include "bus.h"
 
-#include "log.h"
+#include "utils/log.h"
 
 Bus::Bus(Cartridge* cartridge) : m_Cartridge(cartridge) {
     m_VRAM = std::make_unique<VRAM>();

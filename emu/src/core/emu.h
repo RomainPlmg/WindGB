@@ -5,7 +5,7 @@
 
 #include "bus.h"
 #include "cartridge.h"
-#include "common.h"
+#include "utils/common.h"
 #include "cpu.h"
 
 struct GameboyContext {};

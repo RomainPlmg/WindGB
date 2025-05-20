@@ -4,8 +4,8 @@
 #include <fstream>
 #include <unordered_map>
 
-#include "exit_codes.h"
-#include "log.h"
+#include "utils/exit_codes.h"
+#include "utils/log.h"
 
 static const std::unordered_map<u8, std::string_view> CARTRIDGE_TYPES = {{0x00, "ROM ONLY"},
                                                                          {0x01, "MBC1"},

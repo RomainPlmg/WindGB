@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "common.h"
+#include "utils/common.h"
 
 constexpr u16 CARTRIDGE_SIZE = 0x8000;
 

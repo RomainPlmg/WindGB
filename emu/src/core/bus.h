@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "cartridge.h"
-#include "common.h"
+#include "utils/common.h"
 #include "io_reg.h"
 #include "ram.h"
 

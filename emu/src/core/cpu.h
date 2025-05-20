@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "bus.h"
-#include "common.h"
+#include "utils/common.h"
 #include "interrupt.h"
 #include "registers.h"
 

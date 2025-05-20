@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include "utils/common.h"
 #include "bus.h"
 
 constexpr u8 INT_VBLANK_ID = 0x00;

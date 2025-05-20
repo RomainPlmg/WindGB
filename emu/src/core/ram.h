@@ -2,7 +2,7 @@
 
 #include <array>
 
-#include "common.h"
+#include "utils/common.h"
 
 constexpr u16 WRAM_ADDR_START = 0xC000;
 constexpr u16 WRAM_ADDR_SIZE = 0x2000;

@@ -3,9 +3,9 @@
 #include <string>
 
 #include "bus.h"
-#include "common.h"
+#include "utils/common.h"
 #include "cpu.h"
-#include "log.h"
+#include "utils/log.h"
 #include "registers.h"
 
 using InstructionFunc = void (*)(CPU&, Bus&);  // Callback, takes CPU reference and return static void

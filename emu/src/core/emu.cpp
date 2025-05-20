@@ -7,8 +7,8 @@
 #include "bus.h"
 #include "cartridge.h"
 #include "cpu.h"
-#include "exit_codes.h"
-#include "log.h"
+#include "utils/exit_codes.h"
+#include "utils/log.h"
 
 std::atomic<bool> g_ExitRequested = false;
 std::atomic<int> g_ExitSignal{0};

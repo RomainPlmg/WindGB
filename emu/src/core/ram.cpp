@@ -1,6 +1,6 @@
 #include "ram.h"
 
-#include "log.h"
+#include "utils/log.h"
 
 u8 WRAM::Read(u16 addr) const {
     u16 relativeAddr = addr - WRAM_ADDR_START;

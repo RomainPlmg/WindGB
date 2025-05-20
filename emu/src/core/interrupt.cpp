@@ -1,6 +1,6 @@
 #include "interrupt.h"
 
-#include "log.h"
+#include "utils/log.h"
 
 InterruptHandler::InterruptHandler(Bus& memBus) : m_Bus(memBus) {}
 

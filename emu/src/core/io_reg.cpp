@@ -1,6 +1,6 @@
 #include "io_reg.h"
 
-#include "log.h"
+#include "utils/log.h"
 
 u8 IO::Read(u16 addr) const {
     u16 relativeAddr = addr - IO_REG_START;
