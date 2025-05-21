@@ -9,7 +9,7 @@ static constexpr std::array<std::array<u8, 4>, 4> GB_COLORS = {{
     {224, 248, 208, 255}   // colorID = 3
 }};
 
-Tile::Tile(Bus& memBus, u16 baseAddr) : m_Bus(memBus), m_BaseAddr(baseAddr) {}
+Tile::Tile(Bus& memBus, u16 baseAddr) : m_Bus(memBus), m_BaseAddr(baseAddr) { m_Data = m_Bus.GetPointerTo(baseAddr); }
 
 const u8* Tile::GetData() const {
     if (m_Data == nullptr) {
@@ -18,8 +18,7 @@ const u8* Tile::GetData() const {
     return m_Data;
 }
 
-const u8* Tile::GetPixels() const {
-    std::array<u8, TILE_PIXEL_SIZE> pixels;
+const u8* Tile::GetPixels() {
     for (u8 row = 0; row < TILE_WIDTH; row++) {
         u8 firstByte = *(m_Data + row * 2);
         u8 secondByte = *(m_Data + row * 2 + 1);
@@ -31,12 +30,12 @@ const u8* Tile::GetPixels() const {
             u8 colorID = (hi << 1) | lo;
 
             const auto& color = GB_COLORS[colorID];
-            pixels[pixelIndex + 0] = color[0];
-            pixels[pixelIndex + 1] = color[1];
-            pixels[pixelIndex + 2] = color[2];
-            pixels[pixelIndex + 3] = color[3];
+            m_Pixels[pixelIndex + 0] = color[0];
+            m_Pixels[pixelIndex + 1] = color[1];
+            m_Pixels[pixelIndex + 2] = color[2];
+            m_Pixels[pixelIndex + 3] = color[3];
         }
     }
 
-    return pixels.data();
+    return m_Pixels.data();
 }
