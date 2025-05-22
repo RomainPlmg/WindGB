@@ -31,5 +31,6 @@ class UI {
 
    private:
     std::unique_ptr<sf::RenderWindow> m_DebugWindow;
+    std::unique_ptr<sf::RenderWindow> m_MainWindow;
     std::array<sf::Texture*, 384> m_TileTextures;
 };
