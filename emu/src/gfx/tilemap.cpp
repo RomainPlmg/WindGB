@@ -12,34 +12,40 @@ TileMap::TileMap(Bus& memBus, u16 baseAddr) : m_Bus(memBus), m_BaseAddr(baseAddr
     }
     m_Data = m_Bus.GetPointerTo(m_BaseAddr);
     u8 LCDC = m_Bus.Read(IO_REG_LCD_START);
-    m_SignedMode = LCDC & (1 << LCDC_BG_AND_WINDOW_TILES) == 0;
+    m_SignedMode = (LCDC & (1 << LCDC_BG_AND_WINDOW_TILES)) == 0;
 }
 
-const u8* TileMap::GetPixels() const {
-    u16 targetAddr = 0x0000;
-    std::array<u8, TILEMAP_WIDTH * TILEMAP_WIDTH * 4> pixels;
-
-    if (m_SignedMode) {
-        targetAddr = 0x8800;
-    } else {
-        targetAddr = 0x8000;
-    }
-
+const u8* TileMap::GetPixels() {
     for (size_t i = 0; i < TILEMAP_SIZE; i++) {
-        Tile* tile;
+        u16 tileAddr;
         u8 tileIndex = *(m_Data + i);
         if (m_SignedMode) {
-            tile = new Tile(m_Bus, m_BaseAddr + static_cast<int>(tileIndex));
+            tileAddr = 0x9000 + static_cast<int>(tileIndex) * TILE_SIZE;
         } else {
-            tile = new Tile(m_Bus, m_BaseAddr + tileIndex);
+            tileAddr = 0x8000 + tileIndex * TILE_SIZE;
         }
 
-        const u8* tilePixels = tile->GetPixels();
-        for (size_t byte = 0; byte < TILE_PIXEL_SIZE; byte++) {
-            u32 index = i * TILE_PIXEL_SIZE + byte;
-            pixels[index] = *(tilePixels + byte);
+        Tile tile(m_Bus, tileAddr);
+        const u8* tilePixels = tile.GetPixels();
+
+        u32 tilePosX = i % (TILEMAP_WIDTH / TILE_WIDTH);
+        u32 tilePosY = i / (TILEMAP_WIDTH / TILE_WIDTH);
+
+        for (size_t y = 0; y < TILE_WIDTH; y++) {
+            for (size_t x = 0; x < TILE_WIDTH; x++) {
+                u16 tilePixelIndex = (y * TILE_WIDTH + x) * 4;
+
+                u32 pixelGlobalPosX = tilePosX * TILE_WIDTH + x;
+                u32 pixelGlobalPosY = tilePosY * TILE_WIDTH + y;
+
+                size_t pixelIndex = (pixelGlobalPosY * TILEMAP_WIDTH + pixelGlobalPosX) * 4;
+                m_Pixels[pixelIndex + 0] = *(tilePixels + tilePixelIndex + 0);
+                m_Pixels[pixelIndex + 1] = *(tilePixels + tilePixelIndex + 1);
+                m_Pixels[pixelIndex + 2] = *(tilePixels + tilePixelIndex + 2);
+                m_Pixels[pixelIndex + 3] = *(tilePixels + tilePixelIndex + 3);
+            }
         }
     }
 
-    return pixels.data();
+    return m_Pixels.data();
 }

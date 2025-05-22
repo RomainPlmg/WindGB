@@ -18,11 +18,13 @@ class TileMap {
     /* Getters */
     const u8* GetData() const { return m_Data; }
     u16 GetAddr() const { return m_BaseAddr; }
-    const u8* GetPixels() const;
+    const u8* GetPixels();
 
    private:
     Bus& m_Bus;
     const u16 m_BaseAddr;
     const u8* m_Data;
     bool m_SignedMode;
+
+    std::array<u8, TILEMAP_WIDTH * TILEMAP_WIDTH * 4> m_Pixels;
 };
