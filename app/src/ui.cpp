@@ -5,7 +5,7 @@
 #include "gfx/tile.h"
 #include "gfx/tilemap.h"
 
-UI::UI() {
+UI::UI(Gameboy& gameboy) : m_Gameboy(gameboy) {
     m_DebugWindow = std::make_unique<sf::RenderWindow>();
     m_MainWindow = std::make_unique<sf::RenderWindow>();
 }
@@ -16,8 +16,9 @@ UI::~UI() {
     }
 }
 
-void UI::Init(const std::string& title) {
+void UI::Init() {
     std::string windowTitle;
+    std::string title = static_cast<std::string>(m_Gameboy.GetLoadedGame());
     if (title.empty()) {
         windowTitle = "WindGB";
     } else {
@@ -32,19 +33,19 @@ void UI::Init(const std::string& title) {
     }
 }
 
-void UI::Update(Gameboy& gameboy) {
+void UI::Update() {
     // Update debug window
     for (size_t y = 0; y < UI_DEBUG_TILE_Y; y++) {
         for (size_t x = 0; x < UI_DEBUG_TILE_X; x++) {  // Display 384 tiles
             u16 index = y * UI_DEBUG_TILE_X + x;
-            Tile tile(*gameboy.GetBus(), 0x8000 + index * 16);
+            Tile tile(*m_Gameboy.GetBus(), 0x8000 + index * 16);
             m_TileTextures[index]->update(tile.GetPixels());
             DisplayTile(index, x * (TILE_WIDTH + UI_DEBUG_TILE_SPACING), y * (TILE_WIDTH + UI_DEBUG_TILE_SPACING), 2.5f);
         }
     }
 
     // Update main window
-    TileMap tilemap(*gameboy.GetBus(), TILEMAP1_ADDR);
+    TileMap tilemap(*m_Gameboy.GetBus(), TILEMAP1_ADDR);
     sf::Texture tileMapTex(sf::Vector2u(TILEMAP_WIDTH, TILEMAP_WIDTH));
     tileMapTex.update(tilemap.GetPixels());
 

@@ -15,11 +15,11 @@ constexpr int UI_DEBUG_TILE_SPACING = 1;
 
 class UI {
    public:
-    UI();
+    UI(Gameboy& gameboy);
     ~UI();
 
-    void Init(const std::string& title);
-    void Update(Gameboy& gameboy);
+    void Init();
+    void Update();
     void Display();
     void Clear();
     void ProcessEvents();
@@ -30,6 +30,7 @@ class UI {
     void DisplayTile(u16 index, float offsetX, float offsetY, float scale = 1.0f);
 
    private:
+    Gameboy& m_Gameboy;
     std::unique_ptr<sf::RenderWindow> m_DebugWindow;
     std::unique_ptr<sf::RenderWindow> m_MainWindow;
     std::array<sf::Texture*, 384> m_TileTextures;
