@@ -31,12 +31,12 @@ void CPU::Reset() {  // Init registers
     m_Halted = false;
 }
 
-void CPU::Step() {
+u8 CPU::Step() {
     if (m_Halted) {
         if (m_Interrupt->HasPending()) {
             m_Halted = false;
         } else {
-            return;
+            return 0;
         }
     }
 
@@ -59,6 +59,7 @@ void CPU::Step() {
 
     LOG_DEBUG("Executing instruction '{}'\tPC = 0x{:02X}", curInst.name, m_Registers->PC);
 
+    u32 oldCycles = m_Cycles; // Save the nb of cycles before the instruction
     curInst.Execute(*this, m_Bus);  // Run the instruction
 
     // For EI instruction, enable interrupt flag after the next instruction
@@ -68,6 +69,9 @@ void CPU::Step() {
             m_Interrupt->SetIME(true);
         }
     }
+
+    // Return T-Cycles AND NOT M-Cycles !!! (1 M-Cycle = 4 T-Cycles)
+    return (m_Cycles - oldCycles) * 4;
 }
 
 u8 CPU::Fetch8() {

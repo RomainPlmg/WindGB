@@ -11,7 +11,7 @@ class CPU {
    public:
     CPU(Bus& memBus);
     void Reset();
-    void Step();
+    u8 Step();
     void AddCycles(u32 cycles) { m_Cycles += cycles; }
     uint8_t Fetch8();
     uint16_t Fetch16();
