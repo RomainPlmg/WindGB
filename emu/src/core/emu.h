@@ -7,6 +7,7 @@
 #include "cartridge.h"
 #include "cpu.h"
 #include "utils/common.h"
+#include "gfx/ppu.h"
 
 struct GameboyContext {};
 
@@ -29,6 +30,7 @@ class Gameboy {
     u32 m_Ticks;
     std::unique_ptr<Cartridge> m_Cartridge;
     std::unique_ptr<CPU> m_CPU;
+    std::unique_ptr<PPU> m_PPU;
     std::unique_ptr<Bus> m_Bus;
 
     void HandleAsyncExit();

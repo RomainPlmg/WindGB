@@ -55,6 +55,7 @@ Gameboy::Gameboy(int argc, char const* argv[]) {
     m_Cartridge = std::make_unique<Cartridge>();
     m_Bus = std::make_unique<Bus>(m_Cartridge.get());
     m_CPU = std::make_unique<CPU>(*m_Bus);
+    m_PPU = std::make_unique<PPU>(*m_Bus);
 
     if (argc < 2) {
         LOG_CRITICAL("You need to specify a binary to load");
@@ -74,7 +75,8 @@ void Gameboy::Step() {
         HandleAsyncExit();
     }
 
-    m_CPU->Step();
+    u8 cycles = m_CPU->Step(); // Step in the CPU & recover nb of T-Cycles
+    m_PPU->Step(cycles);
 }
 
 std::string_view Gameboy::GetLoadedGame() const {
