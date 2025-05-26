@@ -3,7 +3,6 @@
 #include <array>
 
 #include "gfx/tile.h"
-#include "gfx/tilemap.h"
 
 UI::UI(Gameboy& gameboy) : m_Gameboy(gameboy) {
     m_DebugWindow = std::make_unique<sf::RenderWindow>();
@@ -39,20 +38,10 @@ void UI::Update() {
         for (size_t x = 0; x < UI_DEBUG_TILE_X; x++) {  // Display 384 tiles
             u16 index = y * UI_DEBUG_TILE_X + x;
             Tile tile(*m_Gameboy.GetBus(), 0x8000 + index * 16);
-            m_TileTextures[index]->update(tile.GetPixels());
-            DisplayTile(index, x * (TILE_WIDTH + UI_DEBUG_TILE_SPACING), y * (TILE_WIDTH + UI_DEBUG_TILE_SPACING), 2.5f);
+            // m_TileTextures[index]->update(tile.GetFramebuffer());
+            // DisplayTile(index, x * (TILE_WIDTH + UI_DEBUG_TILE_SPACING), y * (TILE_WIDTH + UI_DEBUG_TILE_SPACING), 2.5f);
         }
     }
-
-    // Update main window
-    TileMap tilemap(*m_Gameboy.GetBus(), TILEMAP1_ADDR);
-    sf::Texture tileMapTex(sf::Vector2u(TILEMAP_WIDTH, TILEMAP_WIDTH));
-    tileMapTex.update(tilemap.GetPixels());
-
-    sf::Sprite tileMapSprite(tileMapTex);
-    tileMapSprite.move(sf::Vector2f(25.0f, 25.0f));
-    tileMapSprite.scale(sf::Vector2f(2.0f, 2.0f));
-    m_MainWindow->draw(tileMapSprite);
 }
 
 void UI::Display() {
@@ -67,13 +56,14 @@ void UI::Clear() {
 
 void UI::ProcessEvents() {
     while (const std::optional event = m_DebugWindow->pollEvent()) {
-        // Close window: exit
-        if (event->is<sf::Event::Closed>()) m_DebugWindow->close();
     }
 
     while (const std::optional event = m_MainWindow->pollEvent()) {
         // Close window: exit
-        if (event->is<sf::Event::Closed>()) m_MainWindow->close();
+        if (event->is<sf::Event::Closed>()) {
+            m_DebugWindow->close();
+            m_MainWindow->close();
+        }
     }
 }
 

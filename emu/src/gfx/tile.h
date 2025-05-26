@@ -17,11 +17,11 @@ class Tile {
     /* Getters */
     u16 GetAddr() const { return m_BaseAddr; }
     const u8* GetData() const;
-    const u8* GetPixels();
+    u8* GetFramebuffer();
 
    private:
     Bus& m_Bus;
     u16 m_BaseAddr;
     const u8* m_Data;
-    std::array<u8, TILE_PIXEL_SIZE> m_Pixels;
+    std::array<u8, TILE_WIDTH * TILE_WIDTH> m_Framebuffer;
 };

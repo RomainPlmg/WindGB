@@ -3,6 +3,7 @@
 #include <array>
 
 #include "core/bus.h"
+#include "tile.h"
 #include "utils/common.h"
 
 constexpr u16 TILEMAP1_ADDR = 0x9800;
@@ -17,14 +18,14 @@ class TileMap {
 
     /* Getters */
     const u8* GetData() const { return m_Data; }
+    u8 GetTileIndex(u16 index) { return *(m_Data + index); }
+    Tile GetTile(u8 tileIndex);
+    Tile GetTile(u8 posX, u8 posY);
     u16 GetAddr() const { return m_BaseAddr; }
-    const u8* GetPixels();
 
    private:
     Bus& m_Bus;
     const u16 m_BaseAddr;
     const u8* m_Data;
     bool m_SignedMode;
-
-    std::array<u8, TILEMAP_WIDTH * TILEMAP_WIDTH * 4> m_Pixels;
 };
