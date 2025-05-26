@@ -6,6 +6,7 @@ Bus::Bus(Cartridge* cartridge) : m_Cartridge(cartridge) {
     m_VRAM = std::make_unique<VRAM>();
     m_WRAM = std::make_unique<WRAM>();
     m_HRAM = std::make_unique<HRAM>();
+    m_OAM = std::make_unique<OAM>();
     m_IOREG = std::make_unique<IO>();
 }
 
@@ -26,8 +27,12 @@ u8 Bus::Read(u16 address) const {
         return m_WRAM->Read(address);
     }
 
-    if (address >= WRAM_ECHO_ADDR_START && address < 0xFE00) {  // WRAM echo data
+    if (address >= WRAM_ECHO_ADDR_START && address < OAM_ADDR_START) {  // WRAM echo data
         return m_WRAM->Read(address - WRAM_ADDR_SIZE);
+    }
+
+    if (address >= OAM_ADDR_START && address < 0xFEA0) {  // WRAM echo data
+        return m_OAM->Read(address);
     }
 
     if (address >= IO_REG_START && address < HRAM_ADDR_START) {  // IOREG data
@@ -59,8 +64,12 @@ const u8* Bus::GetPointerTo(u16 address) {
         return m_WRAM->GetPointerTo(address);
     }
 
-    if (address >= WRAM_ECHO_ADDR_START && address < 0xFE00) {  // WRAM echo data
+    if (address >= WRAM_ECHO_ADDR_START && address < OAM_ADDR_START) {  // WRAM echo data
         return m_WRAM->GetPointerTo(address - WRAM_ADDR_SIZE);
+    }
+
+    if (address >= OAM_ADDR_START && address < 0xFEA0) {  // WRAM echo data
+        return m_OAM->GetPointerTo(address);
     }
 
     if (address >= IO_REG_START && address < HRAM_ADDR_START) {  // IOREG data
@@ -92,8 +101,12 @@ void Bus::Write(u16 address, u8 data) {
         return m_WRAM->Write(address, data);
     }
 
-    if (address >= WRAM_ECHO_ADDR_START && address < 0xFE00) {  // WRAM echo data
+    if (address >= WRAM_ECHO_ADDR_START && address < OAM_ADDR_START) {  // WRAM echo data
         return m_WRAM->Write(address - WRAM_ADDR_SIZE, data);
+    }
+
+    if (address >= OAM_ADDR_START && address < 0xFEA0) {  // WRAM echo data
+        return m_OAM->Write(address, data);
     }
 
     if (address >= IO_REG_START && address < HRAM_ADDR_START) {  // IOREG data

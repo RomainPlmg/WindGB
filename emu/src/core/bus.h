@@ -6,6 +6,7 @@
 #include "utils/common.h"
 #include "io_reg.h"
 #include "ram.h"
+#include "gfx/oam.h"
 
 //      +------------+------------+-------------+--------------------------------+
 //      |  Start     | End        | Size        | Description                   |
@@ -37,6 +38,7 @@ class Bus {
     std::unique_ptr<VRAM> m_VRAM;
     std::unique_ptr<WRAM> m_WRAM;
     std::unique_ptr<HRAM> m_HRAM;
+    std::unique_ptr<OAM> m_OAM;
     std::unique_ptr<IO> m_IOREG;
 
     u8 m_IE;
