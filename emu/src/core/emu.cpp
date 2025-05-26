@@ -67,6 +67,7 @@ Gameboy::Gameboy(int argc, char const* argv[]) {
 }
 
 void Gameboy::Init() {
+    m_Running = true;
     m_CPU->Reset();  // Reset the CPU at the initial state
     m_PPU->Init();
 }
