@@ -89,7 +89,7 @@ def main():
         for future in concurrent.futures.as_completed(future_to_rom):
             name, success, log = future.result()
             print(
-                f"{name.ljust(max_name_length)} --> {"✅ ​Pass" if success else "❌ ​Fail"}"
+                f"{name.ljust(max_name_length)} --> {'PASS' if success else 'FAIL'}"
             )
             results.append(success)
             if log:
@@ -102,7 +102,7 @@ def main():
 
     passed = sum(results)
     total = len(results)
-    print(f"\n🧪 Test summary: {passed} / {total} passed.")
+    print(f"\nTest summary: {passed} / {total} passed.")
 
     if passed != total:
         sys.exit(1)
