@@ -1,0 +1,12 @@
+{
+    "version": "2.0.0",
+    "tasks": [],
+    "inputs": [
+        {
+            "id": "romPath",
+            "type": "promptString",
+            "description": "Path to the Gameboy ROM",
+            "default": "libs/gb-test-roms/cpu_instrs/cpu_instrs.gb"
+        }
+    ]
+}
