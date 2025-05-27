@@ -35,8 +35,9 @@ u8 CPU::Step() {
     if (m_Halted) {
         if (m_Interrupt->HasPending()) {
             m_Halted = false;
+            if (!m_Interrupt->GetIME()) m_Cycles++;
         } else {
-            return 0;
+            return 1;
         }
     }
 

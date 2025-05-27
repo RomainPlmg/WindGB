@@ -40,6 +40,10 @@ void PPU::Step(u8 cycles) {
                 if (m_LY == PPU_NB_LCD_SCANLINES) {     // All 144 scanlines have been drawn, swith to 10 VBLANK scanlines
                     m_FrameBuffer = m_TempFrameBuffer;  // Flush the framebuffer
                     m_CurrentMode = Mode::VBLANK;
+                    // Set the VBLANK interrupt
+                    u8 IF = m_Bus.Read(IO_REG_INTERRUPT_FLAGS);
+                    IF |= (1 << 0);
+                    m_Bus.Write(IO_REG_INTERRUPT_FLAGS, IF);
                 } else {  // Start to draw the next scanline
                     m_CurrentMode = Mode::OAMSCAN;
                 }
