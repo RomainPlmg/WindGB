@@ -6,8 +6,9 @@
 #include "bus.h"
 #include "cartridge.h"
 #include "cpu.h"
-#include "utils/common.h"
 #include "gfx/ppu.h"
+#include "timer.h"
+#include "utils/common.h"
 
 struct GameboyContext {};
 
@@ -32,6 +33,7 @@ class Gameboy {
     std::unique_ptr<Cartridge> m_Cartridge;
     std::unique_ptr<CPU> m_CPU;
     std::unique_ptr<PPU> m_PPU;
+    std::unique_ptr<Timer> m_Timer;
     std::unique_ptr<Bus> m_Bus;
 
     void HandleAsyncExit();
