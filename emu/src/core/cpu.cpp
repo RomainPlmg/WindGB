@@ -4,8 +4,8 @@
 
 #include "bus.h"
 #include "instructions.h"
-#include "utils/log.h"
 #include "registers.h"
+#include "utils/log.h"
 
 CPU::CPU(Bus& memBus) : m_Bus(memBus) {
     m_Registers = std::make_unique<Registers>();
@@ -31,7 +31,7 @@ void CPU::Reset() {  // Init registers
     m_Halted = false;
 }
 
-u8 CPU::Step() {
+int CPU::Step() {
     if (m_Halted) {
         if (m_Interrupt->HasPending()) {
             m_Halted = false;
@@ -60,7 +60,7 @@ u8 CPU::Step() {
 
     LOG_DEBUG("Executing instruction '{}'\tPC = 0x{:02X}", curInst.name, m_Registers->PC);
 
-    u32 oldCycles = m_Cycles; // Save the nb of cycles before the instruction
+    u32 oldCycles = m_Cycles;       // Save the nb of cycles before the instruction
     curInst.Execute(*this, m_Bus);  // Run the instruction
 
     // For EI instruction, enable interrupt flag after the next instruction

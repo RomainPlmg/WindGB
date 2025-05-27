@@ -21,7 +21,7 @@ class PPU {
     enum class Mode { HBLANK = 0, VBLANK, OAMSCAN, DRAWING };
 
     void Init();
-    void Step(u8 cycles);
+    void Step(int cycles);
 
     /* Getters */
     TileSet* GetTileSet() const { return m_TileSet.get(); }

@@ -3,15 +3,15 @@
 #include <memory>
 
 #include "bus.h"
-#include "utils/common.h"
 #include "interrupt.h"
 #include "registers.h"
+#include "utils/common.h"
 
 class CPU {
    public:
     CPU(Bus& memBus);
     void Reset();
-    u8 Step();
+    int Step();
     void AddCycles(u32 cycles) { m_Cycles += cycles; }
     uint8_t Fetch8();
     uint16_t Fetch16();

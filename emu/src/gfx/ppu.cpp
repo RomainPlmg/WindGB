@@ -28,7 +28,7 @@ void PPU::Init() {
     m_LY = 0;
 }
 
-void PPU::Step(u8 cycles) {
+void PPU::Step(int cycles) {
     m_ModeClock += cycles;
 
     // The PPU state machine
@@ -139,7 +139,7 @@ void PPU::RenderScanline() {
         const Tile* p_tile = m_TileSet->GetTile(tileAddr);
 
         // Recover the pixel in the tile
-        
+
         const u8* tileData = p_tile->GetData();
         u8 pixelID = *(tileData + pixelX + pixelY * TILE_WIDTH);
 
