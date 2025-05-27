@@ -11,29 +11,20 @@ TileMap::TileMap(Bus& memBus, u16 baseAddr) : m_Bus(memBus), m_BaseAddr(baseAddr
     }
     m_Data = m_Bus.GetPointerTo(m_BaseAddr);
     u8 LCDC = m_Bus.Read(IO_REG_LCD_START);
-    m_SignedMode = (LCDC & (1 << LCDC_BG_AND_WINDOW_TILES)) == 0;
+    m_SignedMode = GET_BIT(LCDC, LCDC_BG_AND_WINDOW_TILES) == 0;
 }
 
-Tile TileMap::GetTile(u8 tileIndex) {
-    u16 tileAddr;
-    if (m_SignedMode) {
-        tileAddr = 0x9000 + static_cast<int>(tileIndex) * TILE_SIZE;
-    } else {
-        tileAddr = 0x8000 + tileIndex * TILE_SIZE;
-    }
-
-    return Tile(m_Bus, tileAddr);
-}
-
-Tile TileMap::GetTile(u8 posX, u8 posY) {
+u16 TileMap::GetTileAddr(u8 posX, u8 posY) {
     u16 index = posX + posY * (TILEMAP_WIDTH / TILE_WIDTH);
     u8 tileIndex = *(m_Data + index);
     u16 tileAddr;
+    u8 LCDC = m_Bus.Read(IO_REG_LCD_START);
+    m_SignedMode = GET_BIT(LCDC, LCDC_BG_AND_WINDOW_TILES) == 0;
     if (m_SignedMode) {
         tileAddr = 0x9000 + static_cast<int8_t>(tileIndex) * TILE_SIZE;
     } else {
         tileAddr = 0x8000 + tileIndex * TILE_SIZE;
     }
 
-    return Tile(m_Bus, tileAddr);
+    return tileAddr;
 }

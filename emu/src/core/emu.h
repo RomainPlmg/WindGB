@@ -23,6 +23,7 @@ class Gameboy {
     u32 GetTicks() const { return m_Ticks; }
     std::string_view GetLoadedGame() const;
     Bus* GetBus() const { return m_Bus.get(); }
+    PPU* GetPPU() const { return m_PPU.get(); }
 
    private:
     bool m_Running;

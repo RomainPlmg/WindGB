@@ -4,13 +4,22 @@
 
 int main(int argc, char const *argv[]) {
     Gameboy gameboy(argc, argv);
+    UI ui(gameboy);
 
     gameboy.Init();
+    ui.Init();
 
-    int i = 0;
-    while (gameboy.IsRunning()) {
+    while (gameboy.IsRunning() && ui.IsOpen()) {
         // Emulator
         gameboy.Step();
+
+        ui.ProcessEvents();
+
+        if (gameboy.GetPPU()->IsFramebufferReady()) {
+            ui.Clear();
+            ui.Update();
+            ui.Display();
+        }
     }
 
     return 0;

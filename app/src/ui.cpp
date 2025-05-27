@@ -33,15 +33,22 @@ void UI::Init() {
 }
 
 void UI::Update() {
+    // Update main window
+    sf::Texture lcdTex(sf::Vector2u(160, 144));
+    lcdTex.update(m_Gameboy.GetPPU()->GetFramebuffer());
+    sf::Sprite windowSprite(lcdTex);
+    windowSprite.scale(sf::Vector2f(2.5f, 2.5f));
+    m_MainWindow->draw(windowSprite);
+
     // Update debug window
-    for (size_t y = 0; y < UI_DEBUG_TILE_Y; y++) {
-        for (size_t x = 0; x < UI_DEBUG_TILE_X; x++) {  // Display 384 tiles
-            u16 index = y * UI_DEBUG_TILE_X + x;
-            Tile tile(*m_Gameboy.GetBus(), 0x8000 + index * 16);
-            // m_TileTextures[index]->update(tile.GetFramebuffer());
-            // DisplayTile(index, x * (TILE_WIDTH + UI_DEBUG_TILE_SPACING), y * (TILE_WIDTH + UI_DEBUG_TILE_SPACING), 2.5f);
-        }
-    }
+    // for (size_t y = 0; y < UI_DEBUG_TILE_Y; y++) {
+    //     for (size_t x = 0; x < UI_DEBUG_TILE_X; x++) {  // Display 384 tiles
+    //         u16 index = y * UI_DEBUG_TILE_X + x;
+    //         const Tile* tile = m_Gameboy.GetPPU()->GetTileSet()->GetTile(0x8000 + index * 16);
+    //         m_TileTextures[index]->update(tile->GetFramebuffer());
+    //         DisplayTile(index, x * (TILE_WIDTH + UI_DEBUG_TILE_SPACING), y * (TILE_WIDTH + UI_DEBUG_TILE_SPACING), 2.5f);
+    //     }
+    // }
 }
 
 void UI::Display() {

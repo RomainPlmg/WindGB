@@ -18,9 +18,7 @@ class TileMap {
 
     /* Getters */
     const u8* GetData() const { return m_Data; }
-    u8 GetTileIndex(u16 index) { return *(m_Data + index); }
-    Tile GetTile(u8 tileIndex);
-    Tile GetTile(u8 posX, u8 posY);
+    u16 GetTileAddr(u8 posX, u8 posY);
     u16 GetAddr() const { return m_BaseAddr; }
 
    private:
