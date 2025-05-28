@@ -48,11 +48,11 @@ WindGB is a **GameBoy** emulator written in C++. It is designed to be performant
 
 Blargg’s Game Boy Test Suite is a collection of tests used to validate the accuracy of the GameBoy emulation ([🔗Link](https://github.com/retrio/gb-test-roms.git)). Below is a table of the tests executed and their results for WindGB.
 
-### CPU Instructions ❌
+### CPU Instructions ✅
 | Test                               | Result   | Remarks |
 | ---------------------------------- | -------- | ------- |
 | **Test 1: Special**                | ✅ Passed |         |
-| **Test 2: Interrupts**             | ❌ Failed |         |
+| **Test 2: Interrupts**             | ✅ Passed |         |
 | **Test 3: Op SP, HL**              | ✅ Passed |         |
 | **Test 4: Op R, imm**              | ✅ Passed |         |
 | **Test 5: Op RP**                  | ✅ Passed |         |
@@ -62,3 +62,4 @@ Blargg’s Game Boy Test Suite is a collection of tests used to validate the acc
 | **Test 9: Op R, R**                | ✅ Passed |         |
 | **Test 10: Bit Operations**        | ✅ Passed |         |
 | **Test 11: Op A, \[HL\]**          | ✅ Passed |         |
+

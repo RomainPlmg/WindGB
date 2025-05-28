@@ -28,11 +28,11 @@ class CPU {
 
     /* Setters */
     void SetCycles(u32 cycles) { m_Cycles = cycles; }
-    void RequestIMEEnable() { m_EnableIMECountdown = 2; }
+    void RequestIMEEnable() { m_RequestIMEEnable = true; }
     void Halt() { m_Halted = true; }
 
    private:
-    int m_EnableIMECountdown;
+    bool m_RequestIMEEnable;
     bool m_Halted;
     u32 m_Cycles;
     std::unique_ptr<Registers> m_Registers;

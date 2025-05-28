@@ -27,7 +27,7 @@ void CPU::Reset() {  // Init registers
 
     m_Cycles = 0;
     m_Interrupt->SetIME(false);
-    m_EnableIMECountdown = -1;
+    m_RequestIMEEnable = false;
     m_Halted = false;
 }
 
@@ -61,14 +61,14 @@ int CPU::Step() {
     LOG_DEBUG("Executing instruction '{}'\tPC = 0x{:02X}", curInst.name, m_Registers->PC);
 
     u32 oldCycles = m_Cycles;       // Save the nb of cycles before the instruction
-    curInst.Execute(*this, m_Bus);  // Run the instruction
 
     // For EI instruction, enable interrupt flag after the next instruction
-    if (m_EnableIMECountdown > 0) {
-        m_EnableIMECountdown--;
-        if (m_EnableIMECountdown == 0) {
-            m_Interrupt->SetIME(true);
-        }
+    if (m_RequestIMEEnable == true) {
+        curInst.Execute(*this, m_Bus);  // Run the instruction
+        m_Interrupt->SetIME(true);
+        m_RequestIMEEnable = false;
+    } else {
+        curInst.Execute(*this, m_Bus);  // Run the instruction
     }
 
     // Return T-Cycles AND NOT M-Cycles !!! (1 M-Cycle = 4 T-Cycles)
@@ -127,6 +127,7 @@ void CPU::Push16Stack(u16 value) {
 void CPU::HandleInterrupts() {
     if (m_Interrupt->GetIME() && m_Interrupt->HasPending()) {
         u8 id = m_Interrupt->GetNextPending();
+        m_Interrupt->ClearFlag(id);
         if (id != 0xFF) {
             Push16Stack(m_Registers->PC);
             m_Interrupt->SetIME(false);

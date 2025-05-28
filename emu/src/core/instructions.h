@@ -3,10 +3,10 @@
 #include <string>
 
 #include "bus.h"
-#include "utils/common.h"
 #include "cpu.h"
-#include "utils/log.h"
 #include "registers.h"
+#include "utils/common.h"
+#include "utils/log.h"
 
 using InstructionFunc = void (*)(CPU&, Bus&);  // Callback, takes CPU reference and return static void
 
@@ -523,7 +523,9 @@ static void In_RRCA(CPU& cpu, Bus& memBus) {  // RRCA
 }
 
 /** STOP *************************************************************************************************************/
-static void In_STOP(CPU& cpu, Bus& memBus) { exit(0); }  // TODO
+static void In_STOP(CPU& cpu, Bus& memBus) {  // TODO
+    // exit(0);
+}
 
 /** RLA **************************************************************************************************************/
 static void In_RLA(CPU& cpu, Bus& memBus) {  // RLA
