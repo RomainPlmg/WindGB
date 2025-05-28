@@ -61,4 +61,4 @@ Blargg’s Game Boy Test Suite is a collection of tests used to validate the acc
 | **Test 8: Misc Instructions**      | ✅ Passed |         |
 | **Test 9: Op R, R**                | ✅ Passed |         |
 | **Test 10: Bit Operations**        | ✅ Passed |         |
-| **Test 11: Op A, \[HL\]**          | ❌ Failed |         |
+| **Test 11: Op A, \[HL\]**          | ✅ Passed |         |

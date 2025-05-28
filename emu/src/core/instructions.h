@@ -2893,6 +2893,8 @@ static void In_RR_pHL(CPU& cpu, Bus& memBus) {
     bool carry = reg->GetFlag(Registers::Flag::C);
     target = (target >> 1) | (carry << 7);
 
+    memBus.Write(reg->HL, target);
+
     // Flags
     reg->SetFlag(Registers::Flag::Z, target == 0);
     reg->SetFlag(Registers::Flag::N, false);
