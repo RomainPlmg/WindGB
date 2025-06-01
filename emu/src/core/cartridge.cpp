@@ -96,6 +96,8 @@ static const std::unordered_map<u8, std::string_view> LICENSE_CODES = {
     {0xA4, "Konami (Yu-Gi-Oh!)"},
 };
 
+Cartridge::Cartridge() {}
+
 void Cartridge::Load(const std::string& path) {
     std::ifstream file(path, std::ios::binary | std::ios::in);
     if (!file) {
@@ -117,6 +119,9 @@ void Cartridge::Load(const std::string& path) {
         exit(EXIT_INVALID_FORMAT);
     }
 
+    // Create the MBC
+    m_MBC = std::make_unique<MBC1>(m_Context.rom_data, m_Context.ram_data);
+
     m_Context.header = reinterpret_cast<CartridgeHeader*>(m_Context.rom_data.data() + 0x100);
     m_Context.header->title[15] = 0;  // Remove the \0 character
 
@@ -136,30 +141,22 @@ void Cartridge::Load(const std::string& path) {
     LOG_INFO("\tChecksum: 0x{:02X} ({})", m_Context.header->checksum, (x & 0xFF) ? "PASSED" : "FAILED");
 }
 
-u8 Cartridge::Read(u16 addr) const {
-    if (addr >= CARTRIDGE_SIZE) {
-        LOG_ERROR("Read cartridge out of address range 0x0000 - 0x{:04X}: 0x{:04X}", CARTRIDGE_SIZE - 1, addr);
-        return 0;
-    }
-    return m_Context.rom_data.at(addr);
-}
+u8 Cartridge::Read(u16 addr) const { return m_MBC->ReadROM(addr); }
 
 const u8* Cartridge::GetPointerTo(u16 addr) const {
-    if (addr >= CARTRIDGE_SIZE) {
-        LOG_ERROR("Read cartridge out of address range 0x0000 - 0x{:04X}: 0x{:04X}", CARTRIDGE_SIZE - 1, addr);
-        return 0;
+    if (BETWEEN(addr, CARTRIDGE_FIXED_ROM_BANK_START_ADDR, CARTRIDGE_SWITCHABLE_ROM_BANK_START_ADDR - 1)) {
+        // TODO: Get pointer in fixed ROM bank
+        return &m_Context.rom_data.at(addr);
+    } else if (BETWEEN(addr, CARTRIDGE_SWITCHABLE_ROM_BANK_START_ADDR, CARTRIDGE_SWITCHABLE_ROM_BANK_START_ADDR + CARTRIDGE_ROM_BANK_SIZE - 1)) {
+        // TODO: Get pointer in switchable ROM bank
+    } else if (BETWEEN(addr, CARTRIDGE_EXTERNAL_RAM_BANK_START_ADDR, CARTRIDGE_EXTERNAL_RAM_BANK_START_ADDR + CARTRIDGE_RAM_BANK_SIZE - 1)) {
+        // TODO: Get pointer in external RAM bank
     }
-    return &m_Context.rom_data.at(addr);
+
+    return nullptr;
 }
 
-void Cartridge::Write(u16 addr, u8 data) {
-    if (addr >= CARTRIDGE_SIZE) {
-        LOG_ERROR("Write cartridge out of address range 0x0000 - 0x{:04X}: 0x{:04X}", CARTRIDGE_SIZE - 1, addr);
-        return;
-    }
-    m_Context.rom_data[addr] = data;
-    LOG_ERROR("For now ROM only cartridge");
-}
+void Cartridge::Write(u16 addr, u8 data) { m_MBC->WriteROM(data, addr); }
 
 std::string_view CartridgeHeader::GetLicenseName() const {
     auto it = LICENSE_CODES.find(new_lic_code);

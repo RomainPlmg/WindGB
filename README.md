@@ -63,3 +63,4 @@ Blargg’s Game Boy Test Suite is a collection of tests used to validate the acc
 | **Test 10: Bit Operations**        | ✅ Passed |         |
 | **Test 11: Op A, \[HL\]**          | ✅ Passed |         |
 
+<img src="assets/CPU_INSTRS.png" alt="cpu_instrs.gb results" width="300" />

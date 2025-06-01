@@ -1,11 +1,17 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
+#include "mbc/mbc1.h"
 #include "utils/common.h"
 
-constexpr u16 CARTRIDGE_SIZE = 0x8000;
+constexpr u16 CARTRIDGE_FIXED_ROM_BANK_START_ADDR = 0x0000;
+constexpr u16 CARTRIDGE_SWITCHABLE_ROM_BANK_START_ADDR = 0x4000;
+constexpr u16 CARTRIDGE_EXTERNAL_RAM_BANK_START_ADDR = 0xA000;
+constexpr u16 CARTRIDGE_ROM_BANK_SIZE = 0x4000;
+constexpr u16 CARTRIDGE_RAM_BANK_SIZE = 0x2000;
 
 struct CartridgeHeader {
     u8 entry[4];          // 0x0100-0x0103 -> Entry point
@@ -31,11 +37,13 @@ struct CartridgeContext {
     std::string filename;
     u32 rom_size = 0;
     std::vector<u8> rom_data;
+    std::vector<u8> ram_data;
     CartridgeHeader* header;
 };
 
 class Cartridge {
    public:
+    Cartridge();
     void Load(const std::string& path);
 
     u8 Read(u16 addr) const;
@@ -46,5 +54,6 @@ class Cartridge {
     const CartridgeContext& GetContext() const { return m_Context; }
 
    private:
+    std::unique_ptr<MBC1> m_MBC;
     CartridgeContext m_Context;
 };

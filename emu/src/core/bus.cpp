@@ -11,10 +11,6 @@ Bus::Bus(Cartridge* cartridge) : m_Cartridge(cartridge) {
 }
 
 u8 Bus::Read(u16 address) const {
-    if (address == 0xFF44) {  // For Gameboy-Doctor
-        return 0x90;
-    }
-
     if (address < VRAM_ADDR_START) {  // ROM data
         return m_Cartridge->Read(address);
     }
