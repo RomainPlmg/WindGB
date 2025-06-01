@@ -10,6 +10,7 @@
 CPU::CPU(Bus& memBus) : m_Bus(memBus) {
     m_Registers = std::make_unique<Registers>();
     m_Interrupt = std::make_unique<InterruptHandler>(memBus);
+    m_HaltBug = false;
 }
 
 void CPU::Reset() {  // Init registers
@@ -34,41 +35,42 @@ void CPU::Reset() {  // Init registers
 int CPU::Step() {
     if (m_Halted) {
         if (m_Interrupt->HasPending()) {
-            m_Halted = false;
-            if (!m_Interrupt->GetIME()) m_Cycles++;
+            m_Halted = false;  // Wakes up the CPU
+            if (!m_Interrupt->GetIME()) {
+                // Trigger HALT bug
+                m_HaltBug = true;
+                return 4;
+            }
         } else {
-            return 1;
+            return 4;
         }
     }
 
-    // Gameboy Doctor log
-    GBD_LOG_DEBUG("A:{:02x} F:{:02x} B:{:02x} C:{:02x} D:{:02x} E:{:02x} H:{:02x} L:{:02x} SP:{:04x} PC:{:04x} PCMEM:{:02x},{:02x},{:02x},{:02x}",
-                  m_Registers->A, m_Registers->F, m_Registers->B, m_Registers->C, m_Registers->D, m_Registers->E, m_Registers->H, m_Registers->L,
-                  m_Registers->SP, m_Registers->PC, m_Bus.Read(m_Registers->PC), m_Bus.Read(m_Registers->PC + 1), m_Bus.Read(m_Registers->PC + 2),
-                  m_Bus.Read(m_Registers->PC + 3));
+    u32 oldCycles = m_Cycles;  // Save the nb of cycles before the instruction
 
     // Interrupt handler
-    HandleInterrupts();
+    if (!HandleInterrupts()) {  // Fetch the next opcode
+        u8 opcode = Fetch8();
+        Instruction curInst = InstructionTable[opcode];
+        if (m_HaltBug) {
+            m_Registers->PC--;
+            m_HaltBug = false;
+        }
+        if (opcode == 0xCB) {  // Prefix instructions, fetch the next instruction in the same step
+            opcode = Fetch8();
+            curInst = PrefixInstructionTable[opcode];
+        }
 
-    // Fetch the next opcode
-    u8 opcode = Fetch8();
-    Instruction curInst = InstructionTable[opcode];
-    if (opcode == 0xCB) {  // Prefix instructions, fetch the next instruction in the same step
-        opcode = Fetch8();
-        curInst = PrefixInstructionTable[opcode];
-    }
+        LOG_DEBUG("Executing instruction '{}'\tPC = 0x{:02X}", curInst.name, m_Registers->PC);
 
-    LOG_DEBUG("Executing instruction '{}'\tPC = 0x{:02X}", curInst.name, m_Registers->PC);
-
-    u32 oldCycles = m_Cycles;       // Save the nb of cycles before the instruction
-
-    // For EI instruction, enable interrupt flag after the next instruction
-    if (m_RequestIMEEnable == true) {
-        curInst.Execute(*this, m_Bus);  // Run the instruction
-        m_Interrupt->SetIME(true);
-        m_RequestIMEEnable = false;
-    } else {
-        curInst.Execute(*this, m_Bus);  // Run the instruction
+        // For EI instruction, enable interrupt flag after the next instruction
+        if (m_RequestIMEEnable == true) {
+            curInst.Execute(*this, m_Bus);  // Run the instruction
+            m_Interrupt->SetIME(true);
+            m_RequestIMEEnable = false;
+        } else {
+            curInst.Execute(*this, m_Bus);  // Run the instruction
+        }
     }
 
     // Return T-Cycles AND NOT M-Cycles !!! (1 M-Cycle = 4 T-Cycles)
@@ -124,7 +126,7 @@ void CPU::Push16Stack(u16 value) {
     m_Bus.Write(--m_Registers->SP, low);
 }
 
-void CPU::HandleInterrupts() {
+bool CPU::HandleInterrupts() {
     if (m_Interrupt->GetIME() && m_Interrupt->HasPending()) {
         u8 id = m_Interrupt->GetNextPending();
         m_Interrupt->ClearFlag(id);
@@ -134,5 +136,7 @@ void CPU::HandleInterrupts() {
             m_Registers->PC = GetInterrupVector(id);  // Jump to the address of the interrupt handler
             m_Cycles += 5;
         }
+        return true;
     }
+    return false;
 }

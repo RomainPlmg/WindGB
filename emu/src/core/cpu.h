@@ -34,10 +34,11 @@ class CPU {
    private:
     bool m_RequestIMEEnable;
     bool m_Halted;
+    bool m_HaltBug;
     u32 m_Cycles;
     std::unique_ptr<Registers> m_Registers;
     Bus& m_Bus;
     std::unique_ptr<InterruptHandler> m_Interrupt;
 
-    void HandleInterrupts();
+    bool HandleInterrupts();
 };

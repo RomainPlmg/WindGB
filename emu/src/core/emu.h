@@ -14,7 +14,8 @@ struct GameboyContext {};
 
 class Gameboy {
    public:
-    Gameboy(int argc, char const* argv[]);
+    Gameboy(Cartridge& cartridge);
+
     void Init();
     void Step();
 
@@ -26,11 +27,14 @@ class Gameboy {
     Bus* GetBus() const { return m_Bus.get(); }
     PPU* GetPPU() const { return m_PPU.get(); }
 
+    void VerboseLog(bool enable);
+    static void InitLog();
+
    private:
     bool m_Running;
     bool m_Paused;
     u32 m_Ticks;
-    std::unique_ptr<Cartridge> m_Cartridge;
+    Cartridge& m_Cartridge;
     std::unique_ptr<CPU> m_CPU;
     std::unique_ptr<PPU> m_PPU;
     std::unique_ptr<Timer> m_Timer;
