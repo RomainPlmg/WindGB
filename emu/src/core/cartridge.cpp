@@ -141,7 +141,16 @@ void Cartridge::Load(const std::string& path) {
     LOG_INFO("\tChecksum: 0x{:02X} ({})", m_Context.header->checksum, (x & 0xFF) ? "PASSED" : "FAILED");
 }
 
-u8 Cartridge::Read(u16 addr) const { return m_MBC->ReadROM(addr); }
+u8 Cartridge::Read(u16 addr) const {
+    if (addr < 0x8000) {
+        return m_MBC->ReadROM(addr);
+    } else if (addr >= 0xA000 && addr < 0xC000) {
+        return m_MBC->ReadRAM(addr);
+    } else {
+        LOG_ERROR("Addr {} is out of the cartridge range", addr);
+        return 0xFF;
+    }
+}
 
 const u8* Cartridge::GetPointerTo(u16 addr) const {
     if (BETWEEN(addr, CARTRIDGE_FIXED_ROM_BANK_START_ADDR, CARTRIDGE_SWITCHABLE_ROM_BANK_START_ADDR - 1)) {
@@ -156,7 +165,16 @@ const u8* Cartridge::GetPointerTo(u16 addr) const {
     return nullptr;
 }
 
-void Cartridge::Write(u16 addr, u8 data) { m_MBC->WriteROM(data, addr); }
+void Cartridge::Write(u16 addr, u8 data) {
+    if (addr < 0x8000) {
+        return m_MBC->WriteROM(data, addr);
+    } else if (addr >= 0xA000 && addr < 0xC000) {
+        return m_MBC->WriteRAM(data, addr);
+    } else {
+        LOG_ERROR("Addr {} is out of the cartridge range", addr);
+        return;
+    }
+}
 
 std::string_view CartridgeHeader::GetLicenseName() const {
     auto it = LICENSE_CODES.find(new_lic_code);
