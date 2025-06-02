@@ -24,6 +24,7 @@ u8 MBC1::ReadROM(u16 addr) const {
 void MBC1::WriteROM(u8 data, u16 addr) {
     if (addr < 0X2000) {  // RAM enable
         m_RAMEnable = (data & 0x0F) == 0X0A;
+        LOG_INFO("{} cartridge RAM", (m_RAMEnable ? "Enable" : "Disable"));
     } else if (addr < 0x4000) {
         m_ROMBank = data & 0x1F;
         if (m_ROMBank == 0) {
@@ -35,6 +36,6 @@ void MBC1::WriteROM(u8 data, u16 addr) {
     // TODO: Manage bits high and banking modes for + than 32 banks
 }
 
-u8 MBC1::ReadRAM(u16 addr) const { return u8(); }
+u8 MBC1::ReadRAM(u16 addr) const { return 0xFF; }
 
 void MBC1::WriteRAM(u8 data, u16 addr) {}
