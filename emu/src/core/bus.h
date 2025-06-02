@@ -29,9 +29,9 @@ constexpr u16 INTERRUPT_ENABLE_ADDR = 0xFFFF;
 class Bus {
    public:
     Bus(Cartridge* cartridge);
-    u8 Read(u16 address) const;
-    const u8* GetPointerTo(u16 address);
-    void Write(u16 address, u8 data);
+    u8 Read(u16 addr) const;
+    const u8* GetPointerTo(u16 addr);
+    void Write(u16 addr, u8 data);
 
    private:
     Cartridge* m_Cartridge;
