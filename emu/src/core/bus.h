@@ -3,10 +3,9 @@
 #include <memory>
 
 #include "cartridge.h"
-#include "utils/common.h"
-#include "io_reg.h"
-#include "ram.h"
 #include "gfx/oam.h"
+#include "ram.h"
+#include "utils/common.h"
 
 //      +------------+------------+-------------+--------------------------------+
 //      |  Start     | End        | Size        | Description                   |
@@ -26,20 +25,26 @@
 
 constexpr u16 INTERRUPT_ENABLE_ADDR = 0xFFFF;
 
+class IO;
+
 class Bus {
    public:
-    Bus(Cartridge* cartridge);
+    Bus();
     u8 Read(u16 addr) const;
     const u8* GetPointerTo(u16 addr);
     void Write(u16 addr, u8 data);
 
+    /* Attach methods */
+    void Attach(IO* io) { m_IO = io; }
+    void Attach(Cartridge* cartridge) { m_Cartridge = cartridge; }
+
    private:
-    Cartridge* m_Cartridge;
     std::unique_ptr<VRAM> m_VRAM;
     std::unique_ptr<WRAM> m_WRAM;
     std::unique_ptr<HRAM> m_HRAM;
     std::unique_ptr<OAM> m_OAM;
-    std::unique_ptr<IO> m_IOREG;
+    IO* m_IO;
+    Cartridge* m_Cartridge;
 
     u8 m_IE;
 };

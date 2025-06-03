@@ -1,25 +1,24 @@
 #pragma once
 
 #include <array>
+#include <memory>
 
+#include "timer.h"
 #include "utils/common.h"
 
-constexpr u16 IO_REG_START = 0xFF00;
-constexpr u16 IO_REG_SIZE = 0x0080;
-
-constexpr u16 IO_REG_JOYPAD_INPUT = 0xFF00;
-constexpr u16 IO_REG_SERIAL_TRANSFER_START = 0xFF01;
-constexpr u16 IO_REG_SERIAL_TRANSFER_END = 0xFF02;
-constexpr u16 IO_REG_TIMER_AND_DIV_START = 0xFF04;
-constexpr u16 IO_REG_TIMER_AND_DIV_END = 0xFF07;
-constexpr u16 IO_REG_INTERRUPT_FLAGS = 0xFF0F;
-constexpr u16 IO_REG_AUDIO_START = 0xFF10;
-constexpr u16 IO_REG_AUDIO_END = 0xFF26;
-constexpr u16 IO_REG_WAVE_PATTERN_START = 0xFF30;
-constexpr u16 IO_REG_WAVE_PATTERN_END = 0xFF3F;
-constexpr u16 IO_REG_LCD_START = 0xFF40;
-constexpr u16 IO_REG_LCD_END = 0xFF4B;
-constexpr u16 IO_REG_DISABLE_BOOT_ROM = 0xFF50;
+constexpr u16 JOYPAD_INPUT_ADDR = 0xFF00;
+constexpr u16 SERIAL_TRANSFER_START_ADDR = 0xFF01;
+constexpr u16 SERIAL_TRANSFER_END_ADDR = 0xFF02;
+constexpr u16 TIMER_START_ADDR = 0xFF04;
+constexpr u16 TIMER_END_ADDR = 0xFF07;
+constexpr u16 INTERRUPT_FLAGS_ADDR = 0xFF0F;
+constexpr u16 AUDIO_START_ADDR = 0xFF10;
+constexpr u16 AUDIO_END_ADDR = 0xFF26;
+constexpr u16 WAVE_PATTERN_START_ADDR = 0xFF30;
+constexpr u16 WAVE_PATTERN_END_ADDR = 0xFF3F;
+constexpr u16 LCD_START_ADDR = 0xFF40;
+constexpr u16 LCD_END_ADDR = 0xFF4B;
+constexpr u16 DISABLE_BOOT_ROM_ADDR = 0xFF50;
 
 // LCD Control Register globals (0xFF40)
 constexpr u8 LCDC_BG_WINDOW_EN_PRIORITY = 0;
@@ -49,10 +48,19 @@ constexpr u16 LCD_OBP1_ADDR = 0xFF49;
 
 class IO {
    public:
+    IO(Bus& memBus);
+
+    void Reset();
+
     u8 Read(u16 addr) const;
     const u8* GetPointerTo(u16 address) const;
     void Write(u16 addr, u8 data);
 
+    /* Getters */
+    Timer* GetTimer() { return m_Timer.get(); }
+
    private:
-    std::array<u8, IO_REG_SIZE> m_Data;
+    Bus& m_Bus;
+    std::unique_ptr<Timer> m_Timer;
+    std::array<u8, 0x80> m_Data;
 };

@@ -7,10 +7,10 @@
 #include "cartridge.h"
 #include "cpu.h"
 #include "gfx/ppu.h"
-#include "timer.h"
+#include "io.h"
 #include "utils/common.h"
 
-struct GameboyContext {};
+constexpr int T_CYCLES_PER_M_CYCLES = 4;
 
 class Gameboy {
    public:
@@ -37,8 +37,8 @@ class Gameboy {
     Cartridge& m_Cartridge;
     std::unique_ptr<CPU> m_CPU;
     std::unique_ptr<PPU> m_PPU;
-    std::unique_ptr<Timer> m_Timer;
     std::unique_ptr<Bus> m_Bus;
+    std::unique_ptr<IO> m_IO;
 
     void HandleAsyncExit();
     static void signal_callback_handler(int signum);

@@ -1,6 +1,6 @@
 #include "ppu.h"
 
-#include "core/io_reg.h"
+#include "core/io.h"
 #include "tile.h"
 #include "utils/exit_codes.h"
 #include "utils/log.h"
@@ -41,9 +41,9 @@ void PPU::Step(int cycles) {
                     m_FrameBuffer = m_TempFrameBuffer;  // Flush the framebuffer
                     m_CurrentMode = Mode::VBLANK;
                     // Set the VBLANK interrupt
-                    u8 IF = m_Bus.Read(IO_REG_INTERRUPT_FLAGS);
+                    u8 IF = m_Bus.Read(INTERRUPT_FLAGS_ADDR);
                     IF |= (1 << 0);
-                    m_Bus.Write(IO_REG_INTERRUPT_FLAGS, IF);
+                    m_Bus.Write(INTERRUPT_FLAGS_ADDR, IF);
                 } else {  // Start to draw the next scanline
                     m_CurrentMode = Mode::OAMSCAN;
                 }
@@ -92,7 +92,7 @@ void PPU::RenderScanline() {
     u8 SCY = m_Bus.Read(LCD_SCY_ADDR);
     u8 WX = m_Bus.Read(LCD_WX_ADDR);
     u8 WY = m_Bus.Read(LCD_WY_ADDR);
-    u8 LCDC = m_Bus.Read(IO_REG_LCD_START);
+    u8 LCDC = m_Bus.Read(INTERRUPT_FLAGS_ADDR);
 
     // LCDC bits
     bool bgTileMapSel = GET_BIT(LCDC, LCDC_BG_TILE_MAP);      // Background uses Tilemap1 or Tilemap2

@@ -15,16 +15,19 @@ std::atomic<int> g_ExitSignal{0};
 Gameboy::Gameboy(Cartridge& cartridge) : m_Cartridge(cartridge) {
     std::signal(SIGINT, signal_callback_handler);  // Register signal and signal handler
 
-    m_Bus = std::make_unique<Bus>(&m_Cartridge);
-    m_CPU = std::make_unique<CPU>(*m_Bus);
+    m_Bus = std::make_unique<Bus>();
+    m_IO = std::make_unique<IO>(*m_Bus);
+    m_Bus->Attach(m_IO.get());
+    m_Bus->Attach(&m_Cartridge);
+
     m_PPU = std::make_unique<PPU>(*m_Bus);
-    m_Timer = std::make_unique<Timer>(*m_Bus);
+    m_CPU = std::make_unique<CPU>(*m_Bus, *m_PPU, *m_IO);
 }
 
 void Gameboy::Init() {
     m_Running = true;
     m_CPU->Reset();  // Reset the CPU at the initial state
-    m_Timer->Reset();
+    m_IO->Reset();
     m_PPU->Init();
 }
 
@@ -34,8 +37,6 @@ void Gameboy::Step() {
     }
 
     u8 cycles = m_CPU->Step();  // Step in the CPU & recover nb of T-Cycles
-    m_Timer->Step(cycles);
-    m_PPU->Step(cycles);
 }
 
 std::string_view Gameboy::GetLoadedGame() const {

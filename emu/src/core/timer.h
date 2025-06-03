@@ -12,12 +12,16 @@ constexpr u16 TIMER_TAC_REG_ADDR = 0xFF07;
 class Timer {
    public:
     Timer(Bus& memBus);
-
     void Reset();
-    void Step(int cycles);
+    void Step();
+
+    u8 Read(u16 addr);
+    void Write(u16 addr, u8 data);
 
    private:
     Bus& m_Bus;
-    int m_DIVCounter;
-    int m_TIMACounter;
+    u16 m_DIVCounter = 0;
+    u8 m_TIMA = 0;
+    u8 m_TMA = 0;
+    u8 m_TAC = 0;
 };

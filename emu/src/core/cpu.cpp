@@ -4,13 +4,13 @@
 
 #include "bus.h"
 #include "instructions.h"
+#include "io.h"
 #include "registers.h"
 #include "utils/log.h"
 
-CPU::CPU(Bus& memBus) : m_Bus(memBus) {
+CPU::CPU(Bus& memBus, PPU& ppu, IO& io) : m_Bus(memBus), m_PPU(ppu), m_IO(io) {
     m_Registers = std::make_unique<Registers>();
     m_Interrupt = std::make_unique<InterruptHandler>(memBus);
-    m_HaltBug = false;
 }
 
 void CPU::Reset() {  // Init registers
@@ -26,7 +26,7 @@ void CPU::Reset() {  // Init registers
     m_Registers->SP = 0xFFFE;
     m_Registers->PC = 0x0100;  // Jump to the game entry point
 
-    m_Cycles = 0;
+    m_Ticks = 0;
     m_Interrupt->SetIME(false);
     m_RequestIMEEnable = false;
     m_Halted = false;
@@ -39,14 +39,16 @@ int CPU::Step() {
             if (!m_Interrupt->GetIME()) {
                 // Trigger HALT bug
                 m_HaltBug = true;
+                Tick(1);
                 return 4;
             }
         } else {
+            Tick(1);
             return 4;
         }
     }
 
-    u32 oldCycles = m_Cycles;  // Save the nb of cycles before the instruction
+    u32 oldCycles = m_Ticks;  // Save the nb of cycles before the instruction
 
     // Interrupt handler
     if (!HandleInterrupts()) {  // Fetch the next opcode
@@ -74,7 +76,18 @@ int CPU::Step() {
     }
 
     // Return T-Cycles AND NOT M-Cycles !!! (1 M-Cycle = 4 T-Cycles)
-    return (m_Cycles - oldCycles) * 4;
+    return (m_Ticks - oldCycles) * 4;
+}
+
+void CPU::Tick(u32 ticks) {
+    for (int cycle = 0; cycle < ticks; cycle++) {
+        for (int tcycle = 0; tcycle < 4; tcycle++) {
+            m_Ticks++;
+            m_IO.GetTimer()->Step();
+        }
+    }
+
+    m_PPU.Step(ticks);
 }
 
 u8 CPU::Fetch8() {
@@ -134,7 +147,7 @@ bool CPU::HandleInterrupts() {
             Push16Stack(m_Registers->PC);
             m_Interrupt->SetIME(false);
             m_Registers->PC = GetInterrupVector(id);  // Jump to the address of the interrupt handler
-            m_Cycles += 5;
+            Tick(5);
         }
         return true;
     }
