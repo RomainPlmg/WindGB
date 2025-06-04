@@ -3,8 +3,6 @@
 #include "utils/log.h"
 
 MBC1::MBC1(const std::vector<u8>& romData, std::vector<u8> ramData) : m_ROM(romData), m_RAM(std::move(ramData)) {
-    m_ROMBank = 1;
-    m_RAMEnable = false;
 }
 
 u8 MBC1::ReadROM(u16 addr) const {
@@ -31,7 +29,6 @@ void MBC1::WriteROM(u8 data, u16 addr) {
             LOG_WARN("ROM bank cannot be 0");
             m_ROMBank = 1;
         }
-        LOG_INFO("Switch to ROM bank {}", m_ROMBank);
     }
     // TODO: Manage bits high and banking modes for + than 32 banks
 }

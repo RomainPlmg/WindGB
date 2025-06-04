@@ -25,7 +25,7 @@ class Gameboy {
     u32 GetTicks() const { return m_Ticks; }
     std::string_view GetLoadedGame() const;
     Bus* GetBus() const { return m_Bus.get(); }
-    PPU* GetPPU() const { return m_PPU.get(); }
+    PPU* GetPPU() const { return m_IO->GetPPU(); }
 
     void VerboseLog(bool enable);
     static void InitLog();
@@ -36,7 +36,6 @@ class Gameboy {
     u32 m_Ticks;
     Cartridge& m_Cartridge;
     std::unique_ptr<CPU> m_CPU;
-    std::unique_ptr<PPU> m_PPU;
     std::unique_ptr<Bus> m_Bus;
     std::unique_ptr<IO> m_IO;
 

@@ -18,6 +18,6 @@ class MBC1 : public MBC {
     const std::vector<u8>& m_ROM;
     std::vector<u8> m_RAM;
 
-    u8 m_ROMBank;
-    bool m_RAMEnable;
+    u8 m_ROMBank = 1;
+    bool m_RAMEnable = false;
 };

@@ -25,9 +25,9 @@ u8 Bus::Read(u16 addr) const {
         return m_OAM->Read(addr);
     } else if (addr >= 0xFF00 && addr < HRAM_ADDR_START) {  // IOREG data
         return m_IO->Read(addr);
-    } else if (addr < INTERRUPT_ENABLE_ADDR) {  // HRAM data
+    } else if (addr < REG_IE_ADDR) {  // HRAM data
         return m_HRAM->Read(addr);
-    } else if (addr == INTERRUPT_ENABLE_ADDR) {  // IE data
+    } else if (addr == REG_IE_ADDR) {  // IE data
         return m_IE;
     }
 
@@ -50,9 +50,9 @@ const u8* Bus::GetPointerTo(u16 addr) {
         return m_OAM->GetPointerTo(addr);
     } else if (addr >= 0xFF00 && addr < HRAM_ADDR_START) {  // IOREG data
         return m_IO->GetPointerTo(addr);
-    } else if (addr < INTERRUPT_ENABLE_ADDR) {  // HRAM data
+    } else if (addr < REG_IE_ADDR) {  // HRAM data
         return m_HRAM->GetPointerTo(addr);
-    } else if (addr == INTERRUPT_ENABLE_ADDR) {  // IE data
+    } else if (addr == REG_IE_ADDR) {  // IE data
         return &m_IE;
     }
 
@@ -75,9 +75,9 @@ void Bus::Write(u16 addr, u8 data) {
         return m_OAM->Write(addr, data);
     } else if (addr >= 0xFF00 && addr < HRAM_ADDR_START) {  // IOREG data
         return m_IO->Write(addr, data);
-    } else if (addr < INTERRUPT_ENABLE_ADDR) {  // HRAM data
+    } else if (addr < REG_IE_ADDR) {  // HRAM data
         return m_HRAM->Write(addr, data);
-    } else if (addr == INTERRUPT_ENABLE_ADDR) {  // IE data
+    } else if (addr == REG_IE_ADDR) {  // IE data
         m_IE = data;
         return;
     }

@@ -33,17 +33,10 @@ struct CartridgeHeader {
     std::string_view GetTitle() const;
 };
 
-struct CartridgeContext {
-    std::string filename;
-    u32 rom_size = 0;
-    std::vector<u8> rom_data;
-    std::vector<u8> ram_data;
-    CartridgeHeader* header;
-};
-
 class Cartridge {
    public:
     Cartridge();
+    ~Cartridge();
     void Load(const std::string& path);
 
     u8 Read(u16 addr) const;
@@ -51,9 +44,15 @@ class Cartridge {
     void Write(u16 addr, u8 data);
 
     /* Getters */
-    const CartridgeContext& GetContext() const { return m_Context; }
+    const CartridgeHeader* GetHeader() const { return m_Header; }
+    const std::string& GetFilename() const { return m_Filename; }
+    u32 GetROMSize() const { return m_ROMSize; }
+    const std::vector<u8>& GetROMData() const { return m_ROMData; }
 
    private:
     std::unique_ptr<MBC1> m_MBC;
-    CartridgeContext m_Context;
+    CartridgeHeader* m_Header;
+    std::string m_Filename;
+    u32 m_ROMSize = 0;
+    std::vector<u8> m_ROMData;
 };

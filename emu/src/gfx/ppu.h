@@ -20,22 +20,36 @@ class PPU {
     PPU(Bus& memBus);
     enum class Mode { HBLANK = 0, VBLANK, OAMSCAN, DRAWING };
 
-    void Init();
-    void Step(int cycles);
+    void Reset();
+    void Step();
+
+    u8 Read(u16 addr) const;
+    void Write(u16 addr, u8 data);
 
     /* Getters */
     TileSet* GetTileSet() const { return m_TileSet.get(); }
     TileMap* GetTileMap1() const { return m_TileMap1.get(); }
     TileMap* GetTileMap2() const { return m_TileMap2.get(); }
     const u8* GetFramebuffer() const { return m_FrameBuffer.data(); }
-    bool IsFramebufferReady() const { return m_FramebufferReady; }
 
    private:
-    Mode m_CurrentMode;
-    u32 m_ModeClock;
-    u32 m_LY;
     Bus& m_Bus;
-    bool m_FramebufferReady;
+    Mode m_CurrentMode = Mode::OAMSCAN;
+    u32 m_ModeClock = 0;
+
+    // Registers
+    u8 m_LCDC = 0;
+    u8 m_STAT = 0;
+    u8 m_SCY = 0;
+    u8 m_SCX = 0;
+    u8 m_LY = 0;
+    u8 m_LYC = 0;
+    u8 m_DMA = 0;
+    u8 m_BGP = 0;
+    u8 m_OBP0 = 0;
+    u8 m_OBP1 = 0;
+    u8 m_WY = 0;
+    u8 m_WX = 0;
 
     std::unique_ptr<TileSet> m_TileSet;
     std::unique_ptr<TileMap> m_TileMap1;

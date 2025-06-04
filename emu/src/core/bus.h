@@ -23,8 +23,6 @@
 //      | 0xFFFF     | 0xFFFF     | 1 B         | IE (Interrupt Enable)         |
 //      +------------+------------+-------------+--------------------------------+
 
-constexpr u16 INTERRUPT_ENABLE_ADDR = 0xFFFF;
-
 class IO;
 
 class Bus {

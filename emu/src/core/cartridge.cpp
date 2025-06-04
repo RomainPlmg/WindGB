@@ -98,6 +98,11 @@ static const std::unordered_map<u8, std::string_view> LICENSE_CODES = {
 
 Cartridge::Cartridge() {}
 
+Cartridge::~Cartridge() {
+    // delete m_Header;
+    // m_Header = nullptr;
+}
+
 void Cartridge::Load(const std::string& path) {
     std::ifstream file(path, std::ios::binary | std::ios::in);
     if (!file) {
@@ -108,37 +113,37 @@ void Cartridge::Load(const std::string& path) {
     // Read file into the memory
     char byte;
     while (file.read(&byte, 1)) {
-        m_Context.rom_data.push_back(static_cast<u8>(byte));
+        m_ROMData.push_back(static_cast<u8>(byte));
     }
 
-    m_Context.rom_size = m_Context.rom_data.size();
+    m_ROMSize = m_ROMData.size();
 
     if (!file.eof()) {
         LOG_CRITICAL("ROM read failed");
-        m_Context.rom_data = {0};
+        m_ROMData = {0};
         exit(EXIT_INVALID_FORMAT);
     }
 
     // Create the MBC
-    m_MBC = std::make_unique<MBC1>(m_Context.rom_data, m_Context.ram_data);
+    m_MBC = std::make_unique<MBC1>(m_ROMData, std::vector<u8>());
 
-    m_Context.header = reinterpret_cast<CartridgeHeader*>(m_Context.rom_data.data() + 0x100);
-    m_Context.header->title[15] = 0;  // Remove the \0 character
+    m_Header = reinterpret_cast<CartridgeHeader*>(m_ROMData.data() + 0x100);
+    m_Header->title[15] = 0;  // Remove the \0 character
 
     // Checksum
     u8 x = 0;
     for (uint16_t address = 0x0134; address <= 0x014C; address++) {
-        x = x - m_Context.rom_data[address] - 1;
+        x = x - m_ROMData[address] - 1;
     }
 
     LOG_INFO("Cartridge loaded:");
-    LOG_INFO("\tTitle: {}", m_Context.header->GetTitle());
-    LOG_INFO("\tType: 0x{:02X} ({})", m_Context.header->cart_type, m_Context.header->GetCartridgeType());
-    LOG_INFO("\tROM Size: {} KB", 32 << m_Context.header->rom_size);
-    LOG_INFO("\tRAM Size: 0x{:02X}", m_Context.header->ram_size);
-    LOG_INFO("\tLicense Code: 0x{:02X} ({})", m_Context.header->lic_code, m_Context.header->GetLicenseName());
-    LOG_INFO("\tROM Version: 0x{:02X}", m_Context.header->version);
-    LOG_INFO("\tChecksum: 0x{:02X} ({})", m_Context.header->checksum, (x & 0xFF) ? "PASSED" : "FAILED");
+    LOG_INFO("\tTitle: {}", m_Header->GetTitle());
+    LOG_INFO("\tType: 0x{:02X} ({})", m_Header->cart_type, m_Header->GetCartridgeType());
+    LOG_INFO("\tROM Size: {} KB", 32 << m_Header->rom_size);
+    LOG_INFO("\tRAM Size: 0x{:02X}", m_Header->ram_size);
+    LOG_INFO("\tLicense Code: 0x{:02X} ({})", m_Header->lic_code, m_Header->GetLicenseName());
+    LOG_INFO("\tROM Version: 0x{:02X}", m_Header->version);
+    LOG_INFO("\tChecksum: 0x{:02X} ({})", m_Header->checksum, (x & 0xFF) ? "PASSED" : "FAILED");
 }
 
 u8 Cartridge::Read(u16 addr) const {
@@ -155,7 +160,7 @@ u8 Cartridge::Read(u16 addr) const {
 const u8* Cartridge::GetPointerTo(u16 addr) const {
     if (BETWEEN(addr, CARTRIDGE_FIXED_ROM_BANK_START_ADDR, CARTRIDGE_SWITCHABLE_ROM_BANK_START_ADDR - 1)) {
         // TODO: Get pointer in fixed ROM bank
-        return &m_Context.rom_data.at(addr);
+        return &m_ROMData[addr];
     } else if (BETWEEN(addr, CARTRIDGE_SWITCHABLE_ROM_BANK_START_ADDR, CARTRIDGE_SWITCHABLE_ROM_BANK_START_ADDR + CARTRIDGE_ROM_BANK_SIZE - 1)) {
         // TODO: Get pointer in switchable ROM bank
     } else if (BETWEEN(addr, CARTRIDGE_EXTERNAL_RAM_BANK_START_ADDR, CARTRIDGE_EXTERNAL_RAM_BANK_START_ADDR + CARTRIDGE_RAM_BANK_SIZE - 1)) {

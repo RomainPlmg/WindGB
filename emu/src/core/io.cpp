@@ -2,13 +2,21 @@
 
 #include "utils/log.h"
 
-IO::IO(Bus& memBus) : m_Bus(memBus) { m_Timer = std::make_unique<Timer>(m_Bus); }
+IO::IO(Bus& memBus) : m_Bus(memBus) {
+    m_Timer = std::make_unique<Timer>(m_Bus);
+    m_PPU = std::make_unique<PPU>(m_Bus);
+}
 
-void IO::Reset() { m_Timer->Reset(); }
+void IO::Reset() {
+    m_Timer->Reset();
+    m_PPU->Reset();
+}
 
 u8 IO::Read(u16 addr) const {
-    if (BETWEEN(addr, TIMER_START_ADDR, TIMER_END_ADDR)) {
+    if (BETWEEN(addr, REG_DIV_ADDR, REG_TAC_ADDR)) {
         return m_Timer->Read(addr);
+    } else if (BETWEEN(addr, REG_LCDC_ADDR, REG_WX_ADDR)) {
+        return m_PPU->Read(addr);
     }
 
     u16 relativeAddr = addr - 0xFF00;
@@ -29,8 +37,10 @@ const u8* IO::GetPointerTo(u16 addr) const {
 }
 
 void IO::Write(u16 addr, u8 data) {
-    if (BETWEEN(addr, TIMER_START_ADDR, TIMER_END_ADDR)) {
+    if (BETWEEN(addr, REG_DIV_ADDR, REG_TAC_ADDR)) {
         return m_Timer->Write(addr, data);
+    } else if (BETWEEN(addr, REG_LCDC_ADDR, REG_WX_ADDR)) {
+        return m_PPU->Write(addr, data);
     }
 
     u16 relativeAddr = addr - 0xFF00;

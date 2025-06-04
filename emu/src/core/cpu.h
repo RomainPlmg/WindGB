@@ -10,9 +10,9 @@
 
 class CPU {
    public:
-    CPU(Bus& memBus, PPU& ppu, IO& io);
+    CPU(Bus& memBus, IO& io);
     void Reset();
-    int Step();
+    void Step();
     void Tick(u32 ticks);
 
     uint8_t Fetch8();
@@ -40,7 +40,6 @@ class CPU {
     std::unique_ptr<InterruptHandler> m_Interrupt;
 
     Bus& m_Bus;
-    PPU& m_PPU;
     IO& m_IO;
 
     bool HandleInterrupts();

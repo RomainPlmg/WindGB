@@ -23,7 +23,7 @@ class TileMap {
 
    private:
     Bus& m_Bus;
-    const u16 m_BaseAddr;
+    const u16 m_BaseAddr = 0x0000;
     const u8* m_Data;
-    bool m_SignedMode;
+    bool m_SignedMode = false;
 };

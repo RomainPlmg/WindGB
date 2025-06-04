@@ -1,6 +1,5 @@
 #include "ppu.h"
 
-#include "core/io.h"
 #include "tile.h"
 #include "utils/exit_codes.h"
 #include "utils/log.h"
@@ -13,37 +12,47 @@ static constexpr std::array<std::array<u8, 4>, 4> GB_COLORS = {{
 }};
 
 PPU::PPU(Bus& memBus) : m_Bus(memBus) {
-    m_CurrentMode = Mode::OAMSCAN;
-    m_ModeClock = 0;
-    m_LY = 0;
     m_TileMap1 = std::make_unique<TileMap>(m_Bus, TILEMAP1_ADDR);
     m_TileMap2 = std::make_unique<TileMap>(m_Bus, TILEMAP2_ADDR);
     m_TileSet = std::make_unique<TileSet>(m_Bus);
-    m_FramebufferReady = false;
 }
 
-void PPU::Init() {
+void PPU::Reset() {
     m_CurrentMode = Mode::OAMSCAN;
     m_ModeClock = 0;
+    // Registers
+    m_LCDC = 0;
+    m_STAT = 0;
+    m_SCY = 0;
+    m_SCX = 0;
     m_LY = 0;
+    m_LYC = 0;
+    m_DMA = 0;
+    m_BGP = 0;
+    m_OBP0 = 0;
+    m_OBP1 = 0;
+    m_WY = 0;
+    m_WX = 0;
+
+    bool m_FramebufferReady = false;
 }
 
-void PPU::Step(int cycles) {
-    m_ModeClock += cycles;
+void PPU::Step() {
+    m_ModeClock ++;
 
     // The PPU state machine
     switch (m_CurrentMode) {
         case Mode::HBLANK:
-            if (m_ModeClock >= PPU_HBLANK_CYCLES) {
-                m_ModeClock -= PPU_HBLANK_CYCLES;
+            if (m_ModeClock == PPU_HBLANK_CYCLES) {
+                m_ModeClock = 0;
                 m_LY++;
                 if (m_LY == PPU_NB_LCD_SCANLINES) {     // All 144 scanlines have been drawn, swith to 10 VBLANK scanlines
                     m_FrameBuffer = m_TempFrameBuffer;  // Flush the framebuffer
                     m_CurrentMode = Mode::VBLANK;
                     // Set the VBLANK interrupt
-                    u8 IF = m_Bus.Read(INTERRUPT_FLAGS_ADDR);
+                    u8 IF = m_Bus.Read(REG_IF_ADDR);
                     IF |= (1 << 0);
-                    m_Bus.Write(INTERRUPT_FLAGS_ADDR, IF);
+                    m_Bus.Write(REG_IF_ADDR, IF);
                 } else {  // Start to draw the next scanline
                     m_CurrentMode = Mode::OAMSCAN;
                 }
@@ -51,28 +60,26 @@ void PPU::Step(int cycles) {
             break;
 
         case Mode::VBLANK:
-            if (m_ModeClock >= PPU_SCANLINE_CYCLES) {
-                m_ModeClock -= PPU_SCANLINE_CYCLES;
+            if (m_ModeClock == PPU_SCANLINE_CYCLES) {
+                m_ModeClock = 0;
                 m_LY++;
                 if (m_LY > PPU_NB_SCANLINES - 1) {  // All scanlines have been drawn
                     m_LY = 0;
-                    m_FramebufferReady = true;
                     m_CurrentMode = Mode::OAMSCAN;
                 }
             }
             break;
 
         case Mode::OAMSCAN:
-            m_FramebufferReady = false;
-            if (m_ModeClock >= PPU_OAMSCAN_CYCLES) {
-                m_ModeClock -= PPU_OAMSCAN_CYCLES;
+            if (m_ModeClock == PPU_OAMSCAN_CYCLES) {
+                m_ModeClock = 0;
                 m_CurrentMode = Mode::DRAWING;
             }
             break;
 
         case Mode::DRAWING:
-            if (m_ModeClock >= PPU_DRAWING_CYCLES) {
-                m_ModeClock -= PPU_DRAWING_CYCLES;
+            if (m_ModeClock == PPU_DRAWING_CYCLES) {
+                m_ModeClock = 0;
                 RenderScanline();
                 m_CurrentMode = Mode::HBLANK;
             }
@@ -87,33 +94,26 @@ void PPU::Step(int cycles) {
 void PPU::RenderScanline() {
     m_TileSet->Update();
 
-    // Revelant registers
-    u8 SCX = m_Bus.Read(LCD_SCX_ADDR);
-    u8 SCY = m_Bus.Read(LCD_SCY_ADDR);
-    u8 WX = m_Bus.Read(LCD_WX_ADDR);
-    u8 WY = m_Bus.Read(LCD_WY_ADDR);
-    u8 LCDC = m_Bus.Read(INTERRUPT_FLAGS_ADDR);
-
-    // LCDC bits
-    bool bgTileMapSel = GET_BIT(LCDC, LCDC_BG_TILE_MAP);      // Background uses Tilemap1 or Tilemap2
-    bool windowEn = GET_BIT(LCDC, LCDC_WINDOW_EN);            // Show window
-    bool winTileMapSel = GET_BIT(LCDC, LCDC_WINDOW_TILEMAP);  // Window uses Tilemap1 or Tilemap2
+    // m_LCDC bits
+    bool bgTileMapSel = GET_BIT(m_LCDC, 3);   // Background uses Tilemap1 or Tilemap2
+    bool windowEn = GET_BIT(m_LCDC, 5);       // Show window
+    bool winTileMapSel = GET_BIT(m_LCDC, 6);  // Window uses Tilemap1 or Tilemap2
 
     // Revelant variables for background
-    int bgOffsetY = (SCY + m_LY) % 256;                // The offset of the scanline to draw in the background tilemap
+    int bgOffsetY = (m_SCY + m_LY) % 256;              // The offset of the scanline to draw in the background tilemap
     int bgTileCoordY = (bgOffsetY / TILE_WIDTH) % 32;  // Y coordinate of the background tile to print
 
     // Revelant variables for window
-    int winOffsetY = WY;
+    int winOffsetY = m_WY;
     int winTileCoordY = ((m_LY - winOffsetY) / TILE_WIDTH) % 32;
 
     for (int x = 0; x < 160; x++) {  // For each pixel
         // Calculate background tile coordinates X
-        int bgOffsetX = (SCX + x) % 256;
+        int bgOffsetX = (m_SCX + x) % 256;
         int bgTileCoordX = (bgOffsetX / TILE_WIDTH) % 32;
 
         // Calculate window tile coordinate X
-        int winOffsetX = WX - 7;
+        int winOffsetX = m_WX - 7;
         int winTileCoordX = ((x - winOffsetX) / TILE_WIDTH) % 32;
 
         // Recover the correct tilemap
@@ -125,7 +125,7 @@ void PPU::RenderScanline() {
         int pixelY = offsetY % TILE_WIDTH;
         TileMap* tileMap = bgTileMapSel ? m_TileMap2.get() : m_TileMap1.get();
 
-        if (windowEn && m_LY >= WY && x >= WX - 7) {  // LCD is parsing the window & not the background
+        if (windowEn && m_LY >= m_WY && x >= m_WX - 7) {  // LCD is parsing the window & not the background
             tileMap = winTileMapSel ? m_TileMap2.get() : m_TileMap1.get();
             tileCoordX = winTileCoordX;
             tileCoordY = winTileCoordY;
@@ -150,5 +150,83 @@ void PPU::RenderScanline() {
         m_TempFrameBuffer[fbIndex + 1] = color[1];
         m_TempFrameBuffer[fbIndex + 2] = color[2];
         m_TempFrameBuffer[fbIndex + 3] = color[3];
+    }
+}
+
+u8 PPU::Read(u16 addr) const {
+    switch (addr) {
+        case REG_LCDC_ADDR:
+            return m_LCDC;
+        case REG_STAT_ADDR:
+            return m_STAT;
+        case REG_SCY_ADDR:
+            return m_SCY;
+        case REG_SCX_ADDR:
+            return m_SCX;
+        case REG_LY_ADDR:
+            return m_LY;
+        case REG_LYC_ADDR:
+            return m_LYC;
+        case REG_DMA_ADDR:
+            return m_DMA;
+        case REG_BGP_ADDR:
+            return m_BGP;
+        case REG_OBP0_ADDR:
+            return m_OBP0;
+        case REG_OBP1_ADDR:
+            return m_OBP1;
+        case REG_WY_ADDR:
+            return m_WY;
+        case REG_WX_ADDR:
+            return m_WX;
+
+        default:
+            LOG_ERROR("Invalid addr {:02X} for PPU read.", addr);
+            return 0xFF;
+    }
+}
+
+void PPU::Write(u16 addr, u8 data) {
+    switch (addr) {
+        case REG_LCDC_ADDR:
+            m_LCDC = data;
+            break;
+        case REG_STAT_ADDR:
+            m_STAT = data;
+            break;
+        case REG_SCY_ADDR:
+            m_SCY = data;
+            break;
+        case REG_SCX_ADDR:
+            m_SCX = data;
+            break;
+        case REG_LY_ADDR:
+            LOG_ERROR("Cannot write into LY register, read-only.");
+            break;
+        case REG_LYC_ADDR:
+            m_LYC = data;
+            break;
+        case REG_DMA_ADDR:
+            m_DMA = data;
+            break;
+        case REG_BGP_ADDR:
+            m_BGP = data;
+            break;
+        case REG_OBP0_ADDR:
+            m_OBP0 = data;
+            break;
+        case REG_OBP1_ADDR:
+            m_OBP1 = data;
+            break;
+        case REG_WY_ADDR:
+            m_WY = data;
+            break;
+        case REG_WX_ADDR:
+            m_WX = data;
+            break;
+
+        default:
+            LOG_ERROR("Invalid addr {:02X} for PPU read.", addr);
+            break;
     }
 }

@@ -8,7 +8,7 @@
 #include "registers.h"
 #include "utils/log.h"
 
-CPU::CPU(Bus& memBus, PPU& ppu, IO& io) : m_Bus(memBus), m_PPU(ppu), m_IO(io) {
+CPU::CPU(Bus& memBus, IO& io) : m_Bus(memBus), m_IO(io) {
     m_Registers = std::make_unique<Registers>();
     m_Interrupt = std::make_unique<InterruptHandler>(memBus);
 }
@@ -32,7 +32,7 @@ void CPU::Reset() {  // Init registers
     m_Halted = false;
 }
 
-int CPU::Step() {
+void CPU::Step() {
     if (m_Halted) {
         if (m_Interrupt->HasPending()) {
             m_Halted = false;  // Wakes up the CPU
@@ -40,11 +40,11 @@ int CPU::Step() {
                 // Trigger HALT bug
                 m_HaltBug = true;
                 Tick(1);
-                return 4;
+                return;
             }
         } else {
             Tick(1);
-            return 4;
+            return;
         }
     }
 
@@ -74,9 +74,6 @@ int CPU::Step() {
             curInst.Execute(*this, m_Bus);  // Run the instruction
         }
     }
-
-    // Return T-Cycles AND NOT M-Cycles !!! (1 M-Cycle = 4 T-Cycles)
-    return (m_Ticks - oldCycles) * 4;
 }
 
 void CPU::Tick(u32 ticks) {
@@ -84,10 +81,9 @@ void CPU::Tick(u32 ticks) {
         for (int tcycle = 0; tcycle < 4; tcycle++) {
             m_Ticks++;
             m_IO.GetTimer()->Step();
+            m_IO.GetPPU()->Step();
         }
     }
-
-    m_PPU.Step(ticks);
 }
 
 u8 CPU::Fetch8() {

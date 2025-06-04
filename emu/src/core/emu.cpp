@@ -20,15 +20,13 @@ Gameboy::Gameboy(Cartridge& cartridge) : m_Cartridge(cartridge) {
     m_Bus->Attach(m_IO.get());
     m_Bus->Attach(&m_Cartridge);
 
-    m_PPU = std::make_unique<PPU>(*m_Bus);
-    m_CPU = std::make_unique<CPU>(*m_Bus, *m_PPU, *m_IO);
+    m_CPU = std::make_unique<CPU>(*m_Bus, *m_IO);
 }
 
 void Gameboy::Init() {
     m_Running = true;
     m_CPU->Reset();  // Reset the CPU at the initial state
     m_IO->Reset();
-    m_PPU->Init();
 }
 
 void Gameboy::Step() {
@@ -36,11 +34,11 @@ void Gameboy::Step() {
         HandleAsyncExit();
     }
 
-    u8 cycles = m_CPU->Step();  // Step in the CPU & recover nb of T-Cycles
+    m_CPU->Step();  // Step in the CPU & recover nb of T-Cycles
 }
 
 std::string_view Gameboy::GetLoadedGame() const {
-    std::string_view title = m_Cartridge.GetContext().header->GetTitle();
+    std::string_view title = m_Cartridge.GetHeader()->GetTitle();
     return title;
 }
 
