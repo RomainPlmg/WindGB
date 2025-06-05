@@ -31,6 +31,7 @@ class PPU {
     TileMap* GetTileMap1() const { return m_TileMap1.get(); }
     TileMap* GetTileMap2() const { return m_TileMap2.get(); }
     const u8* GetFramebuffer() const { return m_FrameBuffer.data(); }
+    bool ConsumeFrameBufferFlag();
 
    private:
     Bus& m_Bus;
@@ -50,6 +51,8 @@ class PPU {
     u8 m_OBP1 = 0;
     u8 m_WY = 0;
     u8 m_WX = 0;
+
+    bool m_FramebufferReady = false;
 
     std::unique_ptr<TileSet> m_TileSet;
     std::unique_ptr<TileMap> m_TileMap1;

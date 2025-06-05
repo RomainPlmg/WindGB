@@ -34,11 +34,11 @@ void PPU::Reset() {
     m_WY = 0;
     m_WX = 0;
 
-    bool m_FramebufferReady = false;
+    m_FramebufferReady = false;
 }
 
 void PPU::Step() {
-    m_ModeClock ++;
+    m_ModeClock++;
 
     // The PPU state machine
     switch (m_CurrentMode) {
@@ -49,6 +49,7 @@ void PPU::Step() {
                 if (m_LY == PPU_NB_LCD_SCANLINES) {     // All 144 scanlines have been drawn, swith to 10 VBLANK scanlines
                     m_FrameBuffer = m_TempFrameBuffer;  // Flush the framebuffer
                     m_CurrentMode = Mode::VBLANK;
+                    m_FramebufferReady = true;
                     // Set the VBLANK interrupt
                     u8 IF = m_Bus.Read(REG_IF_ADDR);
                     IF |= (1 << 0);
@@ -229,4 +230,12 @@ void PPU::Write(u16 addr, u8 data) {
             LOG_ERROR("Invalid addr {:02X} for PPU read.", addr);
             break;
     }
+}
+
+bool PPU::ConsumeFrameBufferFlag() {
+    if (m_FramebufferReady) {
+        m_FramebufferReady = false;
+        return true;
+    }
+    return false;
 }

@@ -37,20 +37,16 @@ int main(int argc, char const* argv[]) {
     gameboy.Init();
     ui.Init();
 
-    int i = 0;
     while (gameboy.IsRunning() && ui.IsOpen()) {
         // Emulator
         gameboy.Step();
 
-        if (i >= 50000) { // TODO : Callback when framebuffer is ready from PPU
+        if (gameboy.GetPPU()->ConsumeFrameBufferFlag()) {
             ui.ProcessEvents();
             ui.Clear();
             ui.Update();
             ui.Display();
-            i = 0;
         }
-
-        i++;
     }
 
     return 0;
