@@ -62,5 +62,7 @@ constexpr u16 REG_WX_ADDR = 0xFF4B;
 
 // constexpr u16 DISABLE_BOOT_ROM_ADDR = 0xFF50;
 
+constexpr double T_CYCLE_DURATION_US = 0.238418579;
+
 constexpr bool GET_BIT(u32 a, u8 n) { return ((a & (1 << n)) != 0); }
 constexpr bool BETWEEN(u16 addr, u16 a1, u16 a2) { return (addr >= a1) && (addr <= a2); }

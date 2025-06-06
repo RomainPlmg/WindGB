@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <chrono>
 
 #include "bus.h"
 #include "gfx/ppu.h"
@@ -41,6 +42,9 @@ class CPU {
 
     Bus& m_Bus;
     IO& m_IO;
+
+    // Clock
+    using Clock = std::chrono::high_resolution_clock;
 
     bool HandleInterrupts();
 };

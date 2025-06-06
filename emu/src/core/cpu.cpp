@@ -77,6 +77,8 @@ void CPU::Step() {
 }
 
 void CPU::Tick(u32 ticks) {
+    static auto last_time = Clock::now();
+
     for (int cycle = 0; cycle < ticks; cycle++) {
         for (int tcycle = 0; tcycle < 4; tcycle++) {
             m_Ticks++;
@@ -84,6 +86,18 @@ void CPU::Tick(u32 ticks) {
             m_IO.GetPPU()->Step();
         }
     }
+
+    double us_to_wait = ticks * 4 * T_CYCLE_DURATION_US;
+
+    auto now = Clock::now();
+    auto elapsed_us = std::chrono::duration<double, std::micro>(now - last_time).count();
+
+    if (elapsed_us < us_to_wait) {
+        auto sleep_duration = std::chrono::duration<double, std::micro>(us_to_wait - elapsed_us);
+        std::this_thread::sleep_for(sleep_duration);
+    }
+
+    last_time = Clock::now();
 }
 
 u8 CPU::Fetch8() {
