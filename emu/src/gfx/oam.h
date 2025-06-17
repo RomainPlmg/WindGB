@@ -6,6 +6,7 @@
 
 constexpr u16 OAM_ADDR_START = 0xFE00;
 constexpr u16 OAM_ADDR_SIZE = 0x00A0;
+constexpr u16 OAM_ADDR_END = OAM_ADDR_START + OAM_ADDR_SIZE - 1;
 
 class OAM {
    public:
