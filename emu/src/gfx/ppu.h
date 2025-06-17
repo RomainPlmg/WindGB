@@ -15,6 +15,21 @@ constexpr u32 PPU_HBLANK_CYCLES = PPU_SCANLINE_CYCLES - PPU_OAMSCAN_CYCLES - PPU
 constexpr u32 PPU_NB_SCANLINES = 154;
 constexpr u32 PPU_NB_LCD_SCANLINES = 144;
 
+struct Sprite {
+    u8 x;
+    u8 y;
+    u8 tile_index;
+
+    bool bg_priority = false;  // false=OBJ on top of BG, true=BG on top of OBJ
+    bool y_flip = false;
+    bool x_flip = false;
+    bool palette = false;  // false=OBP0, true=OBP1
+
+    u16 oam_addr;
+
+    Sprite(u8 x, u8 y, u8 tile_index) : x(x), y(y), tile_index(tile_index) {}
+};
+
 class PPU {
    public:
     PPU(Bus& memBus);
@@ -57,8 +72,10 @@ class PPU {
     std::unique_ptr<TileSet> m_TileSet;
     std::unique_ptr<TileMap> m_TileMap1;
     std::unique_ptr<TileMap> m_TileMap2;
+    std::vector<Sprite> m_ScanlineSprites;
     std::array<u8, 160 * 144 * 4> m_TempFrameBuffer = {0};
     std::array<u8, 160 * 144 * 4> m_FrameBuffer = {0};
 
     void RenderScanline();
+    void EvaluateSprites();
 };

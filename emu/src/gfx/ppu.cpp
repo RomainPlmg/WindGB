@@ -74,6 +74,7 @@ void PPU::Step() {
         case Mode::OAMSCAN:
             if (m_ModeClock == PPU_OAMSCAN_CYCLES) {
                 m_ModeClock = 0;
+                EvaluateSprites();
                 m_CurrentMode = Mode::DRAWING;
             }
             break;
@@ -108,6 +109,7 @@ void PPU::RenderScanline() {
     int winOffsetY = m_WY;
     int winTileCoordY = ((m_LY - winOffsetY) / TILE_WIDTH) % 32;
 
+    // === BG/WINDOW DRAWING ===
     for (int x = 0; x < 160; x++) {  // For each pixel
         // Calculate background tile coordinates X
         int bgOffsetX = (m_SCX + x) % 256;
@@ -152,6 +154,41 @@ void PPU::RenderScanline() {
         m_TempFrameBuffer[fbIndex + 2] = color[2];
         m_TempFrameBuffer[fbIndex + 3] = color[3];
     }
+}
+
+void PPU::EvaluateSprites() {
+    m_ScanlineSprites.clear();  // Remove all sprites for the new scanline
+
+    const bool sprite_height = GET_BIT(m_LCDC, 2) ? 16 : 8;
+    u32 sprite_count = 0;
+
+    for (u16 i = 0; i < 40; i++) {              // Max 40 sprite per scanline
+        u16 oam_addr = OAM_ADDR_START + i * 4;  // OAM sprite takes 4 bytes in memory
+
+        // Recover sprite data
+        u8 y = m_Bus.Read(oam_addr);
+        u8 x = m_Bus.Read(oam_addr + 1);
+        u8 tile = m_Bus.Read(oam_addr + 2);
+        u8 attr = m_Bus.Read(oam_addr + 3);
+
+        // Check if the scanline intercept the sprite position
+        if (m_LY >= y - 16 && m_LY < y - 16 + sprite_height) {
+            Sprite sprite(x, y, tile);
+            sprite.bg_priority = GET_BIT(attr, 7);
+            sprite.y_flip = GET_BIT(attr, 6);
+            sprite.x_flip = GET_BIT(attr, 5);
+            sprite.palette = GET_BIT(attr, 4);
+            sprite.oam_addr = oam_addr;
+
+            m_ScanlineSprites.push_back(sprite);
+            sprite_count++;
+
+            if (sprite_count == 10) break;  // Max 10 sprites per scanline
+        }
+    }
+
+    // Optional: Sort sprites by X growing
+    std::sort(m_ScanlineSprites.begin(), m_ScanlineSprites.end(), [](const Sprite& a, const Sprite& b) { return a.x < b.x; });
 }
 
 u8 PPU::Read(u16 addr) const {
