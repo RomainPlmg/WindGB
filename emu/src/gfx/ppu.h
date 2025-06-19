@@ -4,10 +4,10 @@
 #include <memory>
 
 #include "core/bus.h"
+#include "events/EventBus.h"
 #include "tilemap.h"
 #include "tileset.h"
 #include "utils/common.h"
-#include "events/EventBus.h"
 
 constexpr u32 PPU_SCANLINE_CYCLES = 456;
 constexpr u32 PPU_OAMSCAN_CYCLES = 80;
@@ -83,4 +83,5 @@ class PPU {
     void RenderScanline();
     void EvaluateSprites();
     void IncrementLY();
+    void UpdateWindowLineCounter();
 };

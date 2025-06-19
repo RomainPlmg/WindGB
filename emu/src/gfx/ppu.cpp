@@ -6,10 +6,10 @@
 #include "utils/log.h"
 
 static constexpr std::array<std::array<u8, 4>, 4> GB_COLORS = {{
-    {180, 180, 180, 255},  // color_id = 0
-    {130, 130, 130, 255},  // color_id = 1
-    {70, 70, 70, 255},     // color_id = 2
-    {37, 37, 37, 255},     // color_id = 3
+    {224, 248, 208, 255},  // color_id = 0
+    {136, 192, 112, 255},  // color_id = 1
+    {52, 104, 86, 255},    // color_id = 2
+    {8, 24, 32, 255},      // color_id = 3
 }};
 
 PPU::PPU(Bus& memBus, EventBus& eventBus) : m_Bus(memBus), m_EventBus(eventBus) {
@@ -41,8 +41,7 @@ void PPU::Reset() {
 }
 
 void PPU::Step() {
-    bool ppu_enable = GET_BIT(m_LCDC, 7);
-    if (!ppu_enable) {
+    if (const bool ppu_enable = GET_BIT(m_LCDC, 7); !ppu_enable) {
         m_ModeClock = 0;
         m_LY = 0;
         m_WindowLineCounter = 0;
@@ -60,7 +59,8 @@ void PPU::Step() {
             if (m_ModeClock == PPU_HBLANK_CYCLES) {
                 m_ModeClock = 0;
                 IncrementLY();
-                if (m_LY == PPU_NB_LCD_SCANLINES) {     // All 144 scanlines have been drawn, swith to 10 VBLANK scanlines
+                if (m_LY == PPU_NB_LCD_SCANLINES) {  // All 144 scanlines have been drawn, switch to 10 VBLANK scanlines
+                    m_WindowLineCounter = 0;
                     m_FrameBuffer = m_TempFrameBuffer;  // Flush the framebuffer
                     m_CurrentMode = Mode::VBLANK;
                     m_FramebufferReady = true;
@@ -69,14 +69,8 @@ void PPU::Step() {
                     IF |= (1 << 0);
                     m_Bus.Write(REG_IF_ADDR, IF);
                 } else {  // Start to draw the next scanline
-                    if (GET_BIT(m_LCDC, 5)) {
-                        if (m_LY == m_WY) {
-                            m_WindowLineCounter = 0;
-                        } else if (m_LY > m_WY) {
-                            m_WindowLineCounter++;
-                        }
-                    }
                     m_CurrentMode = Mode::OAMSCAN;
+                    UpdateWindowLineCounter();
                 }
             }
             break;
@@ -118,37 +112,36 @@ void PPU::RenderScanline() {
     m_TileSet->Update();
 
     // m_LCDC bits
-    bool bg_enable = GET_BIT(m_LCDC, 0);                     // Background enable
-    bool obj_enable = GET_BIT(m_LCDC, 1);                    // Objects enable
-    const bool sprite_height = GET_BIT(m_LCDC, 2) ? 16 : 8;  // Sprite size if 8px or 16px
-    bool bg_tilemap_sel = GET_BIT(m_LCDC, 3);                // Background uses Tilemap1 or Tilemap2
-    bool win_enable = GET_BIT(m_LCDC, 5);                    // Show window
-    bool win_tilemap_sel = GET_BIT(m_LCDC, 6);               // Window uses Tilemap1 or Tilemap2
+    const bool bg_enable = GET_BIT(m_LCDC, 0);             // Background enable
+    const bool obj_enable = GET_BIT(m_LCDC, 1);            // Objects enable
+    const u8 sprite_height = GET_BIT(m_LCDC, 2) ? 16 : 8;  // Sprite size if 8px or 16px
+    const bool bg_tilemap_sel = GET_BIT(m_LCDC, 3);        // Background uses Tilemap1 or Tilemap2
+    const bool win_enable = GET_BIT(m_LCDC, 5);            // Show window
+    const bool win_tilemap_sel = GET_BIT(m_LCDC, 6);       // Window uses Tilemap1 or Tilemap2
 
-    // Revelant variables for background
-    int bg_offset_y = (m_SCY + m_LY) % 256;           // The offset of the scanline to draw in the background tilemap
-    int bg_tile_y = (bg_offset_y / TILE_WIDTH) % 32;  // Y coordinate of the background tile to print
+    // Relevant variables for background
+    const int bg_offset_y = (m_SCY + m_LY) % 256;           // The offset of the scanline to draw in the background tilemap
+    const int bg_tile_y = (bg_offset_y / TILE_WIDTH) % 32;  // Y coordinate of the background tile to print
 
-    // Revelant variables for window
-    int win_offset_y = m_WY;
-    int win_tile_y = (m_WindowLineCounter / TILE_WIDTH) % 32;
+    // Relevant variables for window
+    const int win_offset_y = m_WY;
+    const int win_tile_y = (m_WindowLineCounter / TILE_WIDTH) % 32;
     int offset_y = bg_offset_y;
     int tile_y = bg_tile_y;
     int pixel_y = offset_y % TILE_WIDTH;
 
     // === BG/WINDOW DRAWING ===
     u8 pixel_id = 0;
-    const auto& color = GB_COLORS[pixel_id];
     for (int x = 0; x < 160; x++) {  // For each pixel
-        u32 framebuffer_index = (x + m_LY * 160) * 4;
+        const u32 framebuffer_index = (x + m_LY * 160) * 4;
         if (bg_enable) {
             // Calculate background tile coordinates X
-            int bg_offset_x = (m_SCX + x) % 256;
-            int bg_tile_x = (bg_offset_x / TILE_WIDTH) % 32;
+            const int bg_offset_x = (m_SCX + x) % 256;
+            const int bg_tile_x = (bg_offset_x / TILE_WIDTH) % 32;
 
             // Calculate window tile coordinate X
-            int win_offset_x = m_WX - 7;
-            int win_tile_x = ((x - win_offset_x) / TILE_WIDTH) % 32;
+            const int win_offset_x = m_WX - 7;
+            const int win_tile_x = ((x - win_offset_x) / TILE_WIDTH) % 32;
 
             // Recover the correct tilemap
             int tile_x = bg_tile_x;
@@ -166,7 +159,7 @@ void PPU::RenderScanline() {
                 pixel_y = (m_LY - offset_y) % TILE_WIDTH;
             }
 
-            u16 tile_addr = tile_map->GetTileAddr(tile_x, tile_y);
+            const u16 tile_addr = tile_map->GetTileAddr(tile_x, tile_y);
             const Tile* p_tile = m_TileSet->GetTile(tile_addr);
 
             // Recover the pixels in the tile
@@ -175,29 +168,35 @@ void PPU::RenderScanline() {
         }
 
         // Populate the framebuffer
-        u8 color_id = (m_BGP >> (pixel_id * 2)) & 0x03;
+        const u8 color_id = (m_BGP >> (pixel_id * 2)) & 0x03;
         const auto& color = GB_COLORS[color_id];
         m_TempFrameBuffer[framebuffer_index + 0] = color[0];
         m_TempFrameBuffer[framebuffer_index + 1] = color[1];
         m_TempFrameBuffer[framebuffer_index + 2] = color[2];
         m_TempFrameBuffer[framebuffer_index + 3] = color[3];
     }
+
+    // === SPRITES DRAWING ===
+    if (!obj_enable) return;
+    for (const auto& sprite : m_ScanlineSprites) {
+        u8 sprite_y = m_LY + (sprite.y - 16);  // The relative scanline of the sprite
+    }
 }
 
 void PPU::EvaluateSprites() {
     m_ScanlineSprites.clear();  // Remove all sprites for the new scanline
 
-    const bool sprite_height = GET_BIT(m_LCDC, 2) ? 16 : 8;
+    const u16 sprite_height = GET_BIT(m_LCDC, 2) ? 16 : 8;
     u32 sprite_count = 0;
 
-    for (u16 i = 0; i < 40; i++) {              // OAM store up to 40 sprites
-        u16 oam_addr = OAM_ADDR_START + i * 4;  // OAM sprite takes 4 bytes in memory
+    for (u16 i = 0; i < 40; i++) {                    // OAM store up to 40 sprites
+        const u16 oam_addr = OAM_ADDR_START + i * 4;  // OAM sprite takes 4 bytes in memory
 
         // Recover sprite data
-        u8 y = m_Bus.Read(oam_addr);
-        u8 x = m_Bus.Read(oam_addr + 1);
-        u8 tile = m_Bus.Read(oam_addr + 2);
-        u8 attr = m_Bus.Read(oam_addr + 3);
+        const u8 y = m_Bus.Read(oam_addr);
+        const u8 x = m_Bus.Read(oam_addr + 1);
+        const u8 tile = m_Bus.Read(oam_addr + 2);
+        const u8 attr = m_Bus.Read(oam_addr + 3);
 
         // Check if the scanline intercept the sprite position
         if (m_LY >= y - 16 && m_LY < y - 16 + sprite_height) {
@@ -231,6 +230,11 @@ void PPU::IncrementLY() {
         }
     } else {
         m_STAT &= ~(1 << 2);
+    }
+}
+void PPU::UpdateWindowLineCounter() {
+    if (GET_BIT(m_LCDC, 5) && m_LY > m_WY && m_WX <= 166) {
+        m_WindowLineCounter++;
     }
 }
 
