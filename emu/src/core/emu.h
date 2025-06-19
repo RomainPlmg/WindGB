@@ -6,6 +6,7 @@
 #include "bus.h"
 #include "cartridge.h"
 #include "cpu.h"
+#include "events/EventBus.h"
 #include "gfx/ppu.h"
 #include "io.h"
 #include "utils/common.h"
@@ -38,6 +39,7 @@ class Gameboy {
     std::unique_ptr<CPU> m_CPU;
     std::unique_ptr<Bus> m_Bus;
     std::unique_ptr<IO> m_IO;
+    std::unique_ptr<EventBus> m_EventBus;
 
     void HandleAsyncExit();
     static void signal_callback_handler(int signum);

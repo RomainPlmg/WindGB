@@ -4,14 +4,14 @@
 #include <chrono>
 
 #include "bus.h"
-#include "gfx/ppu.h"
 #include "interrupt.h"
 #include "registers.h"
 #include "utils/common.h"
+#include "events/EventBus.h"
 
 class CPU {
    public:
-    CPU(Bus& memBus, IO& io);
+    CPU(Bus& memBus, IO& io, EventBus& eventBus);
     void Reset();
     void Step();
     void Tick(u32 ticks);
@@ -32,16 +32,21 @@ class CPU {
     void RequestIMEEnable() { m_RequestIMEEnable = true; }
     void Halt() { m_Halted = true; }
 
+    void OnEvent(const Event& event);
+
    private:
     bool m_RequestIMEEnable = false;
     bool m_Halted = false;
     bool m_HaltBug = false;
+    bool m_DMATransfert = false;
+    u16 m_DMASourceAddr = 0x0100;
     u32 m_Ticks = 0;
     std::unique_ptr<Registers> m_Registers;
     std::unique_ptr<InterruptHandler> m_Interrupt;
 
     Bus& m_Bus;
     IO& m_IO;
+    EventBus& m_EventBus;
 
     // Clock
     using Clock = std::chrono::high_resolution_clock;

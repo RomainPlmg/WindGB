@@ -3,14 +3,17 @@
 #include <iostream>
 
 #include "bus.h"
+#include "events/EventApp.h"
 #include "instructions.h"
 #include "io.h"
 #include "registers.h"
 #include "utils/log.h"
 
-CPU::CPU(Bus& memBus, IO& io) : m_Bus(memBus), m_IO(io) {
+CPU::CPU(Bus& memBus, IO& io, EventBus& eventBus) : m_Bus(memBus), m_IO(io), m_EventBus(eventBus) {
     m_Registers = std::make_unique<Registers>();
     m_Interrupt = std::make_unique<InterruptHandler>(memBus);
+
+    m_EventBus.Subscribe(BIND_EVENT_FN(OnEvent), EventCategory::EventCategoryApp);
 }
 
 void CPU::Reset() {  // Init registers
@@ -33,6 +36,8 @@ void CPU::Reset() {  // Init registers
 }
 
 void CPU::Step() {
+    u32 oldCycles = m_Ticks;  // Save the nb of cycles before the instruction
+
     if (m_Halted) {
         if (m_Interrupt->HasPending()) {
             m_Halted = false;  // Wakes up the CPU
@@ -48,7 +53,15 @@ void CPU::Step() {
         }
     }
 
-    u32 oldCycles = m_Ticks;  // Save the nb of cycles before the instruction
+    if (m_DMATransfert) {
+        for (int i = 0; i < 160; i++) {
+            u8 data = m_Bus.Read(m_DMASourceAddr + i);
+            m_Bus.Write(OAM_ADDR_START + i, data);
+            // Tick(1);
+        }
+        m_DMATransfert = false;
+        return;
+    }
 
     // Interrupt handler
     if (!HandleInterrupts()) {  // Fetch the next opcode
@@ -148,4 +161,12 @@ bool CPU::HandleInterrupts() {
         return true;
     }
     return false;
+}
+
+void CPU::OnEvent(const Event& event) {
+    if (event.GetType() == EventType::DMATransfert) {
+        const auto* e = dynamic_cast<const DMATransfertEvent*>(&event);
+        m_DMATransfert = true;
+        m_DMASourceAddr = e->m_SourceAddr;
+    }
 }

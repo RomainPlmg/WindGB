@@ -6,10 +6,11 @@
 #include "timer.h"
 #include "gfx/ppu.h"
 #include "utils/common.h"
+#include "events/EventBus.h"
 
 class IO {
    public:
-    IO(Bus& memBus);
+    IO(Bus& memBus, EventBus& eventBus);
 
     void Reset();
 
@@ -23,6 +24,7 @@ class IO {
 
    private:
     Bus& m_Bus;
+    EventBus& m_EventBus;
     std::unique_ptr<Timer> m_Timer;
     std::unique_ptr<PPU> m_PPU;
     std::array<u8, 0x80> m_Data;

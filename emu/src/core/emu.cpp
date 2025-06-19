@@ -14,13 +14,14 @@ std::atomic<int> g_ExitSignal{0};
 
 Gameboy::Gameboy(Cartridge& cartridge) : m_Cartridge(cartridge) {
     std::signal(SIGINT, signal_callback_handler);  // Register signal and signal handler
+    m_EventBus = std::make_unique<EventBus>();
 
     m_Bus = std::make_unique<Bus>();
-    m_IO = std::make_unique<IO>(*m_Bus);
+    m_IO = std::make_unique<IO>(*m_Bus, *m_EventBus);
     m_Bus->Attach(m_IO.get());
     m_Bus->Attach(&m_Cartridge);
 
-    m_CPU = std::make_unique<CPU>(*m_Bus, *m_IO);
+    m_CPU = std::make_unique<CPU>(*m_Bus, *m_IO, *m_EventBus);
 }
 
 void Gameboy::Init() {
