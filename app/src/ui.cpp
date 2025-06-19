@@ -23,7 +23,7 @@ void UI::Update() {
     sf::Texture lcdTex(sf::Vector2u(160, 144));
     lcdTex.update(m_Gameboy.GetPPU()->GetFramebuffer());
     sf::Sprite windowSprite(lcdTex);
-    windowSprite.scale(sf::Vector2f(2.5f, 2.5f));
+    windowSprite.scale(sf::Vector2f(3.0f, 3.0f));
     m_MainWindow->draw(windowSprite);
 }
 
