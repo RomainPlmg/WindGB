@@ -7,6 +7,7 @@
 #include "tilemap.h"
 #include "tileset.h"
 #include "utils/common.h"
+#include "events/EventBus.h"
 
 constexpr u32 PPU_SCANLINE_CYCLES = 456;
 constexpr u32 PPU_OAMSCAN_CYCLES = 80;
@@ -25,6 +26,7 @@ struct Sprite {
     bool x_flip = false;
     bool palette = false;  // false=OBP0, true=OBP1
 
+    u16 oam_index;
     u16 oam_addr;
 
     Sprite(u8 x, u8 y, u8 tile_index) : x(x), y(y), tile_index(tile_index) {}
@@ -32,7 +34,7 @@ struct Sprite {
 
 class PPU {
    public:
-    PPU(Bus& memBus);
+    PPU(Bus& memBus, EventBus& eventBus);
     enum class Mode { HBLANK = 0, VBLANK, OAMSCAN, DRAWING };
 
     void Reset();
@@ -50,8 +52,10 @@ class PPU {
 
    private:
     Bus& m_Bus;
+    EventBus& m_EventBus;
     Mode m_CurrentMode = Mode::OAMSCAN;
     u32 m_ModeClock = 0;
+    u8 m_WindowLineCounter = 0;
 
     // Registers
     u8 m_LCDC = 0;
@@ -78,4 +82,5 @@ class PPU {
 
     void RenderScanline();
     void EvaluateSprites();
+    void IncrementLY();
 };
