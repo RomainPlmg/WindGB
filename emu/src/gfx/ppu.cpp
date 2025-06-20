@@ -179,7 +179,40 @@ void PPU::RenderScanline() {
     // === SPRITES DRAWING ===
     if (!obj_enable) return;
     for (const auto& sprite : m_ScanlineSprites) {
-        u8 sprite_y = m_LY + (sprite.y - 16);  // The relative scanline of the sprite
+        u8 sprite_y = m_LY - (sprite.y - 16);  // The relative position of the scanline in the sprite
+        if (sprite_y < 0 || sprite_y >= sprite_height) continue;
+
+        if (sprite.y_flip) sprite_y = sprite_height - 1 - sprite_y;
+        u16 tile_addr = (0x8000 + sprite.tile_index * TILE_SIZE);
+        if (sprite_height == 16) {  // 8*16 mode
+            u8 tile_index = sprite.tile_index & 0xFE;
+            if (sprite_y >= 8) tile_index += 1;
+
+            tile_addr = 0x8000 + tile_index * 16;
+        }
+
+        const Tile* tile = m_TileSet->GetTile(tile_addr);
+
+        for (int x = 0; x < 8; x++) {
+            u8 sprite_x = x;  // sprite_x is the relative pixel position in the sprite
+            if (sprite.x_flip) sprite_x = 7 - sprite_x;
+            const u8* tile_data = tile->GetData();                                // Get the corresponding pixel in the tile
+            const u8 pixel_id = *(tile_data + sprite_x + sprite_y * TILE_WIDTH);  // Pixel to render
+            const u8 lcd_x = (sprite.x - 8) + x;                           // lcd_x is the absolute position of the pixel on the LCD
+            if (lcd_x >= 160 || lcd_x < 0) continue;
+
+            const u32 framebuffer_index = (lcd_x + m_LY * 160) * 4;
+            // TODO: Check the pixel color of the background if bg_priority
+            // Populate the framebuffer
+            const u8 palette = sprite.palette ? m_OBP1 : m_OBP0;
+            const u8 color_id = (palette >> (pixel_id * 2)) & 0x03;
+            if (color_id == 0) continue;
+            const auto& color = GB_COLORS[color_id];
+            m_TempFrameBuffer[framebuffer_index + 0] = color[0];
+            m_TempFrameBuffer[framebuffer_index + 1] = color[1];
+            m_TempFrameBuffer[framebuffer_index + 2] = color[2];
+            m_TempFrameBuffer[framebuffer_index + 3] = color[3];
+        }
     }
 }
 
