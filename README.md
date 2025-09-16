@@ -8,7 +8,7 @@ WindGB is a **GameBoy** emulator written in C++. I wrote it to be as most cycle 
 This project is a personal playground to explore emulators. It is not production-ready, but reflects my interest in low-level development and video games.
 To run it, type the following command:
 ```bash
-./windgb <path-of-rom>
+./windgb <rom_file>
 ```
 
 ## 🛠️ Build from source
@@ -39,7 +39,7 @@ To run it, type the following command:
     ```
 4. Run the emulator
     ```bash
-    ./emuapp <rom_file>
+    ./windgb <rom_file>
     ```
 
 ## ⚖️ Credits
